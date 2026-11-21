@@ -2,12 +2,13 @@ import Link from "next/link";
 import { PackageSearch } from "lucide-react";
 import { ProductGrid } from "@/components/product/product-grid";
 import { buttonVariants } from "@/components/ui/button";
-import { getCategories, getCategoryCounts, getProducts } from "@/lib/repositories";
+import { getCategories, getCategoryCounts, getProducts, getFilterFacets } from "@/lib/repositories";
 import { PAGE_SIZE, parseListingParams, type SearchParams } from "@/lib/listing-params";
 import { FilterSidebar, MobileFilterButton } from "./filter-panel";
 import { Pagination } from "./pagination";
 import { SortSelect } from "./sort-select";
 import type { ProductQuery } from "@/types";
+import { Bn } from "@/components/common/bn";
 
 /**
  * Shared product listing: filters + sort + grid + pagination.
@@ -32,13 +33,14 @@ export async function ProductListing({
 }) {
   const sp = await searchParams;
   const { query, page, sort } = parseListingParams(sp);
-  const [all, categories, counts] = await Promise.all([getProducts({ ...query, ...fixed }), getCategories(), getCategoryCounts()]);
+  const [all, categories, counts, facets] = await Promise.all([getProducts({ ...query, ...fixed }), getCategories(), getCategoryCounts(), getFilterFacets(fixed)]);
   const totalPages = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
   const current = Math.min(page, totalPages);
   const products = all.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
   const from = all.length ? (current - 1) * PAGE_SIZE + 1 : 0;
 
   const filterProps = {
+    facets,
     categories: showCategoryFilter ? categories.map((c) => ({ slug: c.slug, name: c.name, count: counts[c.slug] ?? 0 })) : undefined,
     initial: {
       categories: query.categories ?? [],
@@ -71,7 +73,7 @@ export async function ProductListing({
           <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed border-line bg-white px-6 py-16 text-center">
             <PackageSearch className="size-12 text-ink-muted" aria-hidden />
             <p className="t-h3 text-ink">No snacks match your filters</p>
-            <p className="t-bn-s text-ink-soft">ফিল্টার পরিবর্তন করে আবার চেষ্টা করুন।</p>
+            <Bn className="t-bn-s text-ink-soft">ফিল্টার পরিবর্তন করে আবার চেষ্টা করুন।</Bn>
             <Link href={emptyAction.href} className={buttonVariants({ variant: "outline" })}>
               {emptyAction.label}
             </Link>

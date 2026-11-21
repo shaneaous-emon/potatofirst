@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { CartView } from "@/components/cart/cart-view";
 import { PageTitle } from "@/components/common/page-title";
+import { cartTemplate } from "@/content/templates";
+import { headerProps } from "@/components/sections/visibility";
 import { SectionHeader } from "@/components/common/section-header";
 import { ProductGrid } from "@/components/product/product-grid";
 import { getProducts } from "@/lib/repositories";
@@ -17,7 +19,7 @@ export default async function CartPage() {
       </div>
       <section className="pt-16 lg:pt-20">
         <div className="container-site flex flex-col gap-7">
-          <SectionHeader eyebrow="Add more to your bag" title="You may also like" subtitle="একসাথে কিনলে আরো মজা" />
+          <SectionHeader {...headerProps(cartTemplate.upsell.header, cartTemplate.upsell.hide)} />
           <ProductGrid products={suggestions} />
         </div>
       </section>

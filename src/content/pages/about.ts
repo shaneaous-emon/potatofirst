@@ -47,7 +47,7 @@ export const aboutPage: PageContent = {
       type: "newsletter",
       spacingTop: "lg",
       newsletter: { title: "Get snack updates first", subtitle: "নতুন প্রোডাক্ট ও অফারের খবর সবার আগে পেতে সাবস্ক্রাইব করুন।" },
-      social: { title: "Follow our snack stories", subtitle: "Instagram ও Facebook-এ আমাদের সাথে থাকুন।", images: [IMG.catDates, IMG.signatureMix, IMG.catPotato, IMG.review1] },
+      social: { title: "Follow our snack stories", subtitle: "Follow us on Instagram & Facebook for recipes, new flavours and offers.", subtitleBn: "Instagram ও Facebook-এ আমাদের সাথে থাকুন।", images: [IMG.catDates, IMG.signatureMix, IMG.catPotato, IMG.review1] },
     },
   ],
 };

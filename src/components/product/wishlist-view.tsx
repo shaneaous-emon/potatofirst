@@ -6,6 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useWishlist } from "@/stores/wishlist";
 import { useHydrated } from "@/stores/use-hydrated";
+import { Bn } from "@/components/common/bn";
 
 /** Client filter over server-rendered cards: shows only wishlisted products. */
 export function WishlistView({ items }: { items: { id: string; node: React.ReactNode }[] }) {
@@ -27,7 +28,7 @@ export function WishlistView({ items }: { items: { id: string; node: React.React
           <Heart className="size-9" />
         </span>
         <h2 className="t-h3 text-ink">Your wishlist is empty</h2>
-        <p className="t-bn text-ink-soft">পছন্দের স্ন্যাকসে ♡ চাপুন — এখানে সেভ থাকবে।</p>
+        <Bn className="t-bn text-ink-soft">পছন্দের স্ন্যাকসে ♡ চাপুন — এখানে সেভ থাকবে।</Bn>
         <Link href="/shop" className={buttonVariants()}>
           Browse Snacks
         </Link>

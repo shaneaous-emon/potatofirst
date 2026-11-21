@@ -7,6 +7,7 @@ import { WhatsAppIcon } from "@/components/common/whatsapp-icon";
 import { ContactForm } from "@/components/forms/contact-form";
 import { site } from "@/content/site";
 import { whatsappLink } from "@/lib/utils";
+import { Bn } from "@/components/common/bn";
 
 export const metadata: Metadata = { title: "Contact Us", description: "Call, WhatsApp or message Potato First — we're happy to help with your order." };
 
@@ -52,7 +53,7 @@ export default function ContactPage() {
         <section className="flex flex-col gap-5 rounded-md border border-line bg-white p-5 sm:p-8">
           <div>
             <h2 className="t-h3 text-ink">Send us a message</h2>
-            <p className="t-bn-s text-ink-soft">আমরা সাধারণত ২৪ ঘণ্টার মধ্যে উত্তর দিই।</p>
+            <Bn className="t-bn-s text-ink-soft">আমরা সাধারণত ২৪ ঘণ্টার মধ্যে উত্তর দিই।</Bn>
           </div>
           <Suspense fallback={null}>
             <ContactForm />

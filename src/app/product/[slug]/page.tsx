@@ -9,9 +9,12 @@ import { ProductGallery } from "@/components/product/product-gallery";
 import { DeliveryPanel, DescriptionPanel, ReviewsPanel } from "@/components/product/product-tab-panels";
 import { ProductTabs, REVIEWS_ANCHOR } from "@/components/product/product-tabs";
 import { PurchasePanel } from "@/components/product/purchase-panel";
+import { productTemplate } from "@/content/templates";
+import { headerProps } from "@/components/sections/visibility";
 import { WishlistButton } from "@/components/product/wishlist-button";
 import { site } from "@/content/site";
 import { getAllProductSlugs, getProductBySlug, getProductReviews, getRelatedProducts } from "@/lib/repositories";
+import { Bn } from "@/components/common/bn";
 
 export async function generateStaticParams() {
   const slugs = await getAllProductSlugs();
@@ -78,7 +81,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
                     {product.rating.average.toFixed(1)} ({product.rating.count} reviews)
                   </span>
                 </a>
-                <p className="t-bn text-ink-soft">{product.shortDescription}</p>
+                {productTemplate.shortDescription.enabled && <Bn className="t-body text-ink-soft">{product.shortDescription}</Bn>}
               </div>
               <div className="h-px bg-line" />
               <PurchasePanel
@@ -98,12 +101,16 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
           />
         </div>
       </section>
-      <section className="pt-16 lg:pt-20">
-        <div className="container-site flex flex-col gap-7">
-          <SectionHeader eyebrow="You may also like" title="Related Products" subtitle="একই ধরনের আরো কিছু স্ন্যাকস" viewAll={{ href: `/category/${product.categorySlug}` }} />
-          <ProductGrid products={related} />
-        </div>
-      </section>
+      {productTemplate.related.enabled && related.length > 0 && (
+        <section className="pt-16 lg:pt-20">
+          <div className="container-site flex flex-col gap-7">
+            <SectionHeader
+              {...headerProps({ ...productTemplate.related.header, viewAll: { href: `/category/${product.categorySlug}` } }, productTemplate.related.hide)}
+            />
+            <ProductGrid products={related} />
+          </div>
+        </section>
+      )}
     </>
   );
 }

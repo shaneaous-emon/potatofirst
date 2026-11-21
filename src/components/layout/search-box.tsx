@@ -13,7 +13,7 @@ type Suggestion = { slug: string; name: string; subtitle: string; category: stri
  * Figma: Header › Search — with live search.
  * Results appear while typing (debounced); Enter / button → full results page.
  */
-export function SearchBox({ className, compact }: { className?: string; compact?: boolean }) {
+export function SearchBox({ className, compact, onNavigate }: { className?: string; compact?: boolean; onNavigate?: () => void }) {
   const router = useRouter();
   const id = useId();
   const listId = `${id}-list`;
@@ -59,6 +59,7 @@ export function SearchBox({ className, compact }: { className?: string; compact?
 
   const go = (href: string) => {
     setOpen(false);
+    onNavigate?.();
     router.push(href);
   };
   const showPanel = open && q.trim().length >= 2;
@@ -109,7 +110,7 @@ export function SearchBox({ className, compact }: { className?: string; compact?
               setActive((a) => Math.max(-1, a - 1));
             } else if (e.key === "Escape") setOpen(false);
           }}
-          placeholder={compact ? "Search snacks / স্ন্যাকস খুঁজুন" : "Search for chips, dates, peanuts…  /  স্ন্যাকস খুঁজুন"}
+          placeholder={compact ? "Search snacks…" : "Search for chips, dates, peanuts…"}
           className="min-w-0 flex-1 bg-transparent t-body text-ink outline-none placeholder:text-ink-muted max-sm:text-sm [&::-webkit-search-cancel-button]:hidden"
         />
         <button type="submit" aria-label="Search" className={cn("grid shrink-0 cursor-pointer place-items-center rounded-full bg-orange-500 text-brown-900 transition-colors hover:bg-orange-600 hover:text-white", compact ? "size-9" : "size-11")}>

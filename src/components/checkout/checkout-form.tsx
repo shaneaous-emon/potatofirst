@@ -21,6 +21,8 @@ import { formatPrice } from "@/lib/utils";
 import { checkoutSchema, type CheckoutValues } from "@/lib/validation/schemas";
 import { selectSubtotal, useCart } from "@/stores/cart";
 import { useHydrated } from "@/stores/use-hydrated";
+import { Bn } from "@/components/common/bn";
+import { bn } from "@/lib/bn";
 
 function Step({ n, title, subtitle }: { n: number; title: string; subtitle: string }) {
   return (
@@ -28,7 +30,7 @@ function Step({ n, title, subtitle }: { n: number; title: string; subtitle: stri
       <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brown-700 t-label text-cream-100">{n}</span>
       <div>
         <h2 className="t-h3 text-ink">{title}</h2>
-        <p className="t-bn-s text-ink-soft">{subtitle}</p>
+        <Bn className="t-bn-s text-ink-soft">{subtitle}</Bn>
       </div>
     </div>
   );
@@ -62,7 +64,7 @@ export function CheckoutForm() {
       <div className="flex flex-col items-center gap-4 rounded-lg border border-line bg-white px-6 py-16 text-center">
         <ShoppingBag className="size-12 text-brown-700" aria-hidden />
         <h2 className="t-h3 text-ink">Your cart is empty</h2>
-        <p className="t-bn text-ink-soft">চেকআউট করার আগে কার্টে পণ্য যোগ করুন।</p>
+        <Bn className="t-bn text-ink-soft">চেকআউট করার আগে কার্টে পণ্য যোগ করুন।</Bn>
         <Link href="/shop" className={buttonVariants()}>
           Start Shopping
         </Link>
@@ -94,7 +96,7 @@ export function CheckoutForm() {
     <form noValidate onSubmit={onSubmit} className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_440px] lg:gap-8">
       <div className="flex flex-col gap-6">
         <section className="flex flex-col gap-5 rounded-md border border-line bg-white p-5 sm:p-8">
-          <Step n={1} title="Delivery Details" subtitle="আপনার নাম, ফোন ও ঠিকানা দিন" />
+          <Step n={1} title="Delivery Details" subtitle="Your name, phone number and address" />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField id="name" label="Full Name" required error={errors.name?.message}>
               <Input id="name" autoComplete="name" placeholder="e.g. Rahim Uddin" {...register("name")} {...invalid("name")} />
@@ -119,7 +121,7 @@ export function CheckoutForm() {
               render={({ field }) => (
                 <RadioGroup value={field.value} onValueChange={field.onChange} className="grid grid-cols-1 gap-3 sm:grid-cols-2" aria-label="Delivery area">
                   {(["inside-dhaka", "outside-dhaka"] as const).map((k) => (
-                    <RadioCard key={k} value={k} title={site.delivery[k].label} description={`${site.delivery[k].labelBn} · ${site.delivery[k].eta}`} trailing={formatPrice(site.delivery[k].charge)} />
+                    <RadioCard key={k} value={k} title={site.delivery[k].label} description={bn(`${site.delivery[k].labelBn} · Delivery in ${site.delivery[k].eta}`)} trailing={formatPrice(site.delivery[k].charge)} />
                   ))}
                 </RadioGroup>
               )}
@@ -137,14 +139,14 @@ export function CheckoutForm() {
         </section>
 
         <section className="flex flex-col gap-4 rounded-md border border-line bg-white p-5 sm:p-8">
-          <Step n={2} title="Payment Method" subtitle="পেমেন্ট পদ্ধতি বেছে নিন" />
+          <Step n={2} title="Payment Method" subtitle="Choose how you want to pay" />
           <Controller
             control={control}
             name="paymentMethod"
             render={({ field }) => (
               <RadioGroup value={field.value} onValueChange={field.onChange} className="flex flex-col gap-3" aria-label="Payment method">
-                <RadioCard value="cod" title="Cash on Delivery" description="পণ্য হাতে পেয়ে টাকা পরিশোধ করুন" icon={<Banknote className="size-5 text-green-600" aria-hidden />} />
-                <RadioCard value="bkash" title="bKash" description="বিকাশে পেমেন্ট করুন" icon={<Smartphone className="size-5 text-[#e2136e]" aria-hidden />} />
+                <RadioCard value="cod" title="Cash on Delivery" description="Pay when you receive your order" icon={<Banknote className="size-5 text-green-600" aria-hidden />} />
+                <RadioCard value="bkash" title="bKash" description="Pay with your bKash account" icon={<Smartphone className="size-5 text-[#e2136e]" aria-hidden />} />
                 <RadioCard value="online" title="Online Payment / Card" description="Card, Nagad, Rocket & more (secure gateway)" icon={<CreditCard className="size-5 text-brown-700" aria-hidden />} />
               </RadioGroup>
             )}

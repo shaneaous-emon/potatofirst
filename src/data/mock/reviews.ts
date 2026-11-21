@@ -3,10 +3,10 @@ import type { Review } from "@/types";
 import { IMG } from "./images";
 
 const BODIES = [
-  { body: "“খেজুরগুলো একদম নরম আর মিষ্টি। প্যাকেজিংও খুব সুন্দর ছিল।”", image: IMG.review1 },
+  { body: "“The dates were really soft and sweet. Lovely packaging too.”", image: IMG.review1 },
   { body: "“Great with evening tea. Will order the bigger pack next time.”" },
-  { body: "“বাচ্চাদের টিফিনের জন্য নিয়েছিলাম, সবাই পছন্দ করেছে।”", image: IMG.review3 },
-  { body: "“সময়মতো ডেলিভারি, বক্সটাও দারুণ।”" },
+  { body: "“Bought it for the kids’ tiffin — everyone loved it.”", image: IMG.review3 },
+  { body: "“On-time delivery and a great-looking box.”" },
 ];
 
 const LOCATIONS = ["Dhaka", "Chattogram", "Sylhet", "Rajshahi"];
@@ -27,8 +27,8 @@ export function sampleReviewsFor(productId: string): Review[] {
 
 /** Homepage reel-style reviews (photo / video UGC). */
 export const reelReviews: Review[] = [
-  { id: "reel-1", productId: "p-date-bites", author: "Customer", rating: 5, date: "", body: "“খেজুরগুলো একদম নরম আর মিষ্টি। প্যাকেজিংও সুন্দর।”", image: IMG.review1, videoUrl: "" },
+  { id: "reel-1", productId: "p-date-bites", author: "Customer", rating: 5, date: "", body: "“Soft, sweet dates and lovely packaging.”", image: IMG.review1, videoUrl: "" },
   { id: "reel-2", productId: "p-peanut-roasted", author: "Customer", rating: 5, date: "", body: "“Perfect office snack — fresh & crunchy!”", image: IMG.review2 },
-  { id: "reel-3", productId: "p-chips-classic", author: "Customer", rating: 5, date: "", body: "“বাচ্চারা চিপস খুব পছন্দ করেছে।”", image: IMG.review3, videoUrl: "" },
-  { id: "reel-4", productId: "p-combo-everyday", author: "Customer", rating: 5, date: "", body: "“সময়মতো ডেলিভারি, বক্সটাও দারুণ।”", image: IMG.review4, videoUrl: "" },
+  { id: "reel-3", productId: "p-chips-classic", author: "Customer", rating: 5, date: "", body: "“The kids loved these chips.”", image: IMG.review3, videoUrl: "" },
+  { id: "reel-4", productId: "p-combo-everyday", author: "Customer", rating: 5, date: "", body: "“On-time delivery and a great-looking box.”", image: IMG.review4, videoUrl: "" },
 ];

@@ -13,6 +13,7 @@ import { site } from "@/content/site";
 import { parseOrder, readLastOrderRaw } from "@/lib/services/orders";
 import { formatPrice, whatsappLink } from "@/lib/utils";
 import type { Order } from "@/types";
+import { Bn } from "@/components/common/bn";
 
 const PAYMENT = { cod: "Cash on Delivery", bkash: "bKash", online: "Online Payment" } as const;
 
@@ -37,7 +38,7 @@ export function OrderConfirmation() {
         <CheckCircle2 className="size-12" />
       </span>
       <h1 className="t-h1 text-ink">Thank you! Your order is placed.</h1>
-      <p className="t-bn text-ink-soft">আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে। কনফার্ম করতে আমরা শীঘ্রই আপনাকে কল করব।</p>
+      <Bn className="t-bn text-ink-soft">আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে। কনফার্ম করতে আমরা শীঘ্রই আপনাকে কল করব।</Bn>
       <div className="flex items-center gap-3 rounded-md bg-cream-100 px-4 py-3">
         <span className="t-body-s text-ink-soft">Order ID</span>
         <span className="t-h3 text-brown-700">#{orderId}</span>
@@ -74,16 +75,16 @@ export function OrderConfirmation() {
         <h2 className="t-h4 text-ink">What happens next?</h2>
         <ol className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           {[
-            { I: Phone, a: "We call to confirm", b: "অর্ডার নিশ্চিত করতে কল" },
-            { I: Package, a: "Packed with care", b: "যত্নের সাথে প্যাকিং" },
-            { I: Truck, a: "Delivered to you", b: "আপনার ঠিকানায় ডেলিভারি" },
+            { I: Phone, a: "We call to confirm", b: "Within a few hours" },
+            { I: Package, a: "Packed with care", b: "Sealed and checked" },
+            { I: Truck, a: "Delivered to you", b: "Right to your door" },
           ].map(({ I, a, b }) => (
             <li key={a} className="flex flex-col gap-2.5 rounded-sm bg-cream-50 p-4">
               <span className="grid size-10 place-items-center rounded-full bg-orange-100 text-orange-600">
                 <I className="size-5" aria-hidden />
               </span>
               <span className="t-label text-ink">{a}</span>
-              <span className="t-bn-s text-ink-soft">{b}</span>
+              <Bn as="span" className="t-bn-s text-ink-soft">{b}</Bn>
             </li>
           ))}
         </ol>

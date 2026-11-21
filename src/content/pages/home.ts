@@ -19,8 +19,14 @@ export const homePage: PageContent = {
     {
       id: "hero",
       type: "hero",
-      main: { image: IMG.heroMain, href: "/shop" },
-      side: { image: IMG.heroSide, href: "/track-order" },
+      intervalMs: 4000,
+      // Placeholder slides — replace with real banners (1720×880) from the admin panel.
+      slides: [
+        { image: IMG.heroMain, href: "/shop" },
+        { image: IMG.promoCombo, href: "/category/snack-combos" },
+        { image: IMG.brandScene, href: "/shop" },
+      ],
+      side: [{ image: IMG.heroSide, href: "/track-order" }],
     },
     {
       id: "trust",
@@ -111,7 +117,7 @@ export const homePage: PageContent = {
       hide: ["eyebrow"], // eyebrow text kept, switched off (Figma)
       type: "reviewReels",
       header: { eyebrow: "Customer Stories", title: "Loved by Snack Lovers", subtitle: "Little bites. Future stories.", viewAll: { href: "/shop" } },
-      share: { text: "Share your snack moment · আপনার রিভিউ শেয়ার করুন", cta: { label: "Upload Review", href: "/contact?subject=review" } },
+      share: { text: "Share your snack moment · আপনার রিভিউ শেয়ার করুন", cta: { label: "Upload Review", href: "#review" } },
     },
     {
       id: "newsletter",
@@ -120,7 +126,8 @@ export const homePage: PageContent = {
       newsletter: { title: "Get snack updates first", subtitle: "নতুন প্রোডাক্ট ও অফারের খবর সবার আগে পেতে সাবস্ক্রাইব করুন।" },
       social: {
         title: "Follow our snack stories",
-        subtitle: "Instagram ও Facebook-এ আমাদের সাথে থাকুন — রেসিপি, নতুন ফ্লেভার আর অফার।",
+        subtitle: "Follow us on Instagram & Facebook for recipes, new flavours and offers.",
+        subtitleBn: "Instagram ও Facebook-এ আমাদের সাথে থাকুন — রেসিপি, নতুন ফ্লেভার আর অফার।",
         images: [IMG.catDates, IMG.signatureMix, IMG.catPotato, IMG.review1],
       },
     },

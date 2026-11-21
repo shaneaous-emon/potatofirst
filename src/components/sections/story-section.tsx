@@ -6,6 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { SectionShell } from "./section-shell";
 import { isOn } from "./visibility";
 import type { StorySection as Props } from "./types";
+import { Bn } from "@/components/common/bn";
 
 /**
  * Figma: 11 Why Potato First (brand story, dark brown).
@@ -24,7 +25,7 @@ export function StorySection({ hide, eyebrow, title, body, bodyBn, image, floati
               </IconCircle>
               <div>
                 <p className="t-h4 text-ink">{floatingCard.title}</p>
-                <p className="t-bn-s text-ink-soft">{floatingCard.subtitle}</p>
+                <Bn className="t-bn-s text-ink-soft">{floatingCard.subtitle}</Bn>
               </div>
             </div>
           )}
@@ -33,7 +34,7 @@ export function StorySection({ hide, eyebrow, title, body, bodyBn, image, floati
           {eyebrow && isOn(hide, "eyebrow") && <p className="t-eyebrow text-orange-500">{eyebrow}</p>}
           <h2 className="t-h1 text-cream-100">{title}</h2>
           {isOn(hide, "body") && <p className="t-body-l text-cream-100/80">{body}</p>}
-          {bodyBn && isOn(hide, "bodyBn") && <p className="t-bn text-[17px] text-orange-500">{bodyBn}</p>}
+          {bodyBn && isOn(hide, "bodyBn") && <Bn className="t-bn text-[17px] text-orange-500">{bodyBn}</Bn>}
           {isOn(hide, "points") && <ul className="grid gap-4 sm:grid-cols-2">
             {points.map((pt) => (
               <li key={pt.title} className="flex items-center gap-3.5 rounded-md border border-cream-100/15 bg-cream-100/[0.08] p-4">
@@ -42,7 +43,7 @@ export function StorySection({ hide, eyebrow, title, body, bodyBn, image, floati
                 </IconCircle>
                 <div className="min-w-0">
                   <p className="t-h4 text-cream-100">{pt.title}</p>
-                  <p className="t-bn-s text-cream-100/70">{pt.subtitle}</p>
+                  <Bn className="t-bn-s text-cream-100/70">{pt.subtitle}</Bn>
                 </div>
               </li>
             ))}

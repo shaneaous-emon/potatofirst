@@ -63,10 +63,16 @@ export function parseOrder(raw: string | null, id?: string | null): Order | null
 export type TrackingStep = { status: OrderStatus; label: string; time?: string; state: "done" | "current" | "upcoming" };
 
 /** MOCK tracking result — returns a demo timeline for any valid input. */
-export async function trackOrder(orderId: string): Promise<{ orderId: string; steps: TrackingStep[] }> {
+/**
+ * MOCK tracking. Phase 2 → GET /api/orders/track?order_id=…&phone=…
+ * Either value works: phone returns the latest order for that number.
+ */
+export async function trackOrder({ orderId, phone }: { orderId?: string; phone?: string }): Promise<{ orderId: string; lookup: "id" | "phone"; phone?: string; steps: TrackingStep[] }> {
   await new Promise((r) => setTimeout(r, 500));
   return {
-    orderId,
+    orderId: orderId || "PF-240018",
+    lookup: orderId ? "id" : "phone",
+    phone,
     steps: [
       { status: "placed", label: "Order Placed", time: "DD Mon, 10:30 am", state: "done" },
       { status: "confirmed", label: "Confirmed", time: "DD Mon, 11:15 am", state: "done" },

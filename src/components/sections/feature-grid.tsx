@@ -4,6 +4,7 @@ import { SectionHeader } from "@/components/common/section-header";
 import { SectionShell } from "./section-shell";
 import { headerProps, isOn } from "./visibility";
 import type { FeatureGridSection } from "./types";
+import { Bn } from "@/components/common/bn";
 
 /** Generic icon feature grid (About › "What we stand for"). */
 export function FeatureGrid({ header, hide, items, spacingTop, spacingBottom, background }: FeatureGridSection) {
@@ -19,7 +20,7 @@ export function FeatureGrid({ header, hide, items, spacingTop, spacingBottom, ba
               </IconCircle>
               <h3 className="t-h4 text-ink">{it.title}</h3>
               <p className="t-body-s text-ink-soft">{it.body}</p>
-              {it.bodyBn && isOn(hide, "bodyBn") && <p className="t-bn-s text-orange-600">{it.bodyBn}</p>}
+              {it.bodyBn && isOn(hide, "bodyBn") && <Bn className="t-bn-s text-orange-600">{it.bodyBn}</Bn>}
             </li>
           ))}
         </ul>

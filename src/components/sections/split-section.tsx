@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { SectionShell } from "./section-shell";
 import { isOn } from "./visibility";
 import type { SplitSection as Props } from "./types";
+import { Bn } from "@/components/common/bn";
 
 /** Generic image + text split section (About hero, story blocks, landing pages). */
 export function SplitSection({ id, hide, eyebrow, title, titleSize = "h2", body, bodyBn, image, imageSide = "right", cta, breadcrumb, spacingTop, spacingBottom, background }: Props) {
@@ -18,7 +19,7 @@ export function SplitSection({ id, hide, eyebrow, title, titleSize = "h2", body,
           {eyebrow && isOn(hide, "eyebrow") && <p className="t-eyebrow text-green-600">{eyebrow}</p>}
           <Heading className={cn(titleSize === "display" ? "t-display" : "t-h2", "text-ink")}>{title}</Heading>
           {body && <p className="t-body-l text-ink-soft">{body}</p>}
-          {bodyBn && isOn(hide, "bodyBn") && <p className="t-bn text-brown-700">{bodyBn}</p>}
+          {bodyBn && isOn(hide, "bodyBn") && <Bn className="t-bn text-brown-700">{bodyBn}</Bn>}
           {cta && isOn(hide, "cta") && (
             <Link href={cta.href} className={buttonVariants({ className: "mt-1 self-start" })}>
               {cta.label}

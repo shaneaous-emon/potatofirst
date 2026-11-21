@@ -42,7 +42,7 @@ export function ProductCardActions({ item, inStock = true }: { item: Item; inSto
 
   return (
     <Button
-      className="w-full max-sm:h-10 max-sm:px-2 max-sm:text-sm group-hover/card:bg-orange-500 group-hover/card:text-brown-900"
+      className="w-full max-sm:h-10 max-sm:px-2 max-sm:text-sm group-hover/card:bg-orange-500 group-hover/card:text-brown-900 hover:!bg-brown-900 hover:!text-white"
       onClick={() => {
         add(item);
         toast.success("Added to cart", {

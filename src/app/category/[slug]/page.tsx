@@ -8,6 +8,7 @@ import { ListingSkeleton } from "@/components/shop/listing-skeleton";
 import { ProductListing } from "@/components/shop/product-listing";
 import { SubCategoryChips } from "@/components/shop/sub-category-chips";
 import { getCategories, getCategoryBySlug, getCategoryCounts } from "@/lib/repositories";
+import { Bn } from "@/components/common/bn";
 
 export async function generateStaticParams() {
   const cats = await getCategories();
@@ -42,7 +43,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps<"
             <Image src={cat.banner.src} alt="" fill priority sizes="(min-width:1280px) 1280px, 100vw" className="-z-10 object-cover" />
             <span className="absolute inset-0 -z-10 bg-gradient-to-r from-brown-900/90 via-brown-900/50 to-transparent" aria-hidden />
             <h1 className="t-h1 text-white">{cat.name}</h1>
-            <p className="max-w-md t-bn text-cream-100">{cat.description}</p>
+            <Bn className="max-w-md t-bn text-cream-100">{cat.description}</Bn>
             <span className="self-start rounded-full bg-orange-500 px-3 py-1.5 t-caption text-brown-900">{counts[cat.slug] ?? 0} products</span>
           </div>
         </div>

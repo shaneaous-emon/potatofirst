@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Phone, ShieldCheck, ShoppingCart, Truck } from "lucide-react";
+import { MapPin, Phone, ShieldCheck, ShoppingCart, Truck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { WhatsAppIcon } from "@/components/common/whatsapp-icon";
@@ -13,6 +13,7 @@ import { useCart } from "@/stores/cart";
 import type { ImageAsset, ProductVariant } from "@/types";
 import { Price } from "./price";
 import { QuantityStepper } from "./quantity-stepper";
+import { Bn } from "@/components/common/bn";
 
 type Props = {
   product: { id: string; slug: string; name: string; image: ImageAsset; variants: ProductVariant[]; categoryName: string; categorySlug: string };
@@ -42,9 +43,16 @@ export function PurchasePanel({ product }: Props) {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-center gap-3">
-        <Price price={variant.price} compareAt={variant.compareAtPrice} size="lg" />
-        {off > 0 && <Badge tone="red">Save {off}%</Badge>}
+      <div className="flex flex-col gap-1">
+        <div className="flex flex-wrap items-center gap-3" aria-live="polite">
+          <Price price={variant.price * qty} compareAt={variant.compareAtPrice ? variant.compareAtPrice * qty : undefined} size="lg" />
+          {off > 0 && <Badge tone="red">Save {off}%</Badge>}
+        </div>
+        {qty > 1 && (
+          <p className="t-body-s text-ink-muted">
+            {formatPrice(variant.price)} each × {qty}
+          </p>
+        )}
       </div>
 
       {product.variants.length > 1 && (
@@ -108,15 +116,19 @@ export function PurchasePanel({ product }: Props) {
 
       <ul className="flex flex-col gap-3.5 rounded-md bg-cream-100 p-5">
         {[
-          { I: Truck, a: `Inside Dhaka: ${formatPrice(site.delivery["inside-dhaka"].charge)} · ${site.delivery["inside-dhaka"].eta}`, b: `ঢাকার বাইরে: ${formatPrice(site.delivery["outside-dhaka"].charge)} · ${site.delivery["outside-dhaka"].eta}` },
-          { I: ShieldCheck, a: "Cash on Delivery available", b: "পণ্য হাতে পেয়ে টাকা পরিশোধ করুন" },
-          { I: Phone, a: `Need help? ${site.hotline}`, b: "অর্ডারে সাহায্যের জন্য কল করুন" },
+          ...Object.values(site.delivery).map((d, i) => ({
+            I: i === 0 ? Truck : MapPin,
+            a: `${d.label}: ${formatPrice(d.charge)}`,
+            b: `Delivery in ${d.eta}`,
+          })),
+          { I: ShieldCheck, a: "Cash on Delivery available", b: "Pay when you receive your order" },
+          { I: Phone, a: `Need help? ${site.hotline}`, b: "Call or WhatsApp us" },
         ].map(({ I, a, b }) => (
           <li key={a} className="flex items-center gap-3">
             <I className="size-5 shrink-0 text-green-600" aria-hidden />
             <span>
               <span className="block t-label text-ink">{a}</span>
-              <span className="block t-bn-s text-ink-soft">{b}</span>
+              <Bn as="span" className="block t-bn-s text-ink-soft">{b}</Bn>
             </span>
           </li>
         ))}

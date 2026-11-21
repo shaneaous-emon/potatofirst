@@ -14,9 +14,14 @@ export const site = {
   email: "info@potatofirst.com",
   address: "Address goes here, Dhaka",
   hours: "Sat – Thu, 10am – 8pm",
+  /** Rotating announcement bar messages (admin-editable list). */
   announcement: {
-    text: "[Delivery / offer message goes here]",
-    textBn: "ডেলিভারি বা অফারের তথ্য এখানে লিখুন",
+    intervalMs: 4000,
+    messages: [
+      { text: "Cash on Delivery all over Bangladesh", href: "/policies/delivery" },
+      { text: "Inside Dhaka delivery in 1–2 days", href: "/policies/delivery" },
+      { text: "Combo packs — save more on every order", href: "/category/snack-combos" },
+    ],
   },
   /** Mock delivery charges (BDT). Admin-editable later. */
   delivery: {
@@ -36,6 +41,14 @@ export const site = {
    */
   features: {
     wishlist: { enabled: false, hoverOnly: true },
+    /**
+     * Bangla secondary text (subtitles, helper lines). Off = every Bangla
+     * string is hidden site-wide; English copy stays. Sections can still
+     * hide individual elements with `hide: [...]`.
+     */
+    bangla: false,
+    /** Customer accounts (login / sign up / social login). */
+    accounts: { enabled: true, social: { google: true, facebook: true } },
   },
 } as const;
 

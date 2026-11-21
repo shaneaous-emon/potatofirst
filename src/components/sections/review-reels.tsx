@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ReviewUploadDialog } from "@/components/reviews/review-upload-dialog";
 import { Quote } from "lucide-react";
 import { Carousel } from "@/components/common/carousel";
 import { IconCircle } from "@/components/common/icon-circle";
@@ -8,6 +8,7 @@ import { getProducts, getReelReviews } from "@/lib/repositories";
 import { ReviewReelCard } from "./review-reel-card";
 import { SectionShell } from "./section-shell";
 import { headerProps, isOn } from "./visibility";
+import { bn } from "@/lib/bn";
 import type { ReviewReelsSection } from "./types";
 
 /**
@@ -40,11 +41,13 @@ export async function ReviewReels({ header, hide, share, spacingTop = "lg", spac
               <IconCircle tone="orange-solid" size={40}>
                 <Quote />
               </IconCircle>
-              <p className="t-h4 text-ink">{share.text}</p>
+              <p className="t-h4 text-ink">{bn(share.text)}</p>
             </div>
-            <Link href={share.cta.href} className={buttonVariants({ className: "max-sm:w-full" })}>
-              {share.cta.label}
-            </Link>
+            <ReviewUploadDialog
+              products={products.map((p) => ({ id: p.id, name: p.name }))}
+              label={share.cta.label}
+              triggerClassName={buttonVariants({ className: "max-sm:w-full" })}
+            />
           </div>
         )}
       </div>

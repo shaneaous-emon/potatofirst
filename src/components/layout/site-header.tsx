@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { Truck, User } from "lucide-react";
+import { Truck } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { mainNav } from "@/content/site";
 import { AnnouncementBar } from "./announcement-bar";
+import { AccountButton } from "./account-button";
 import { CartButton } from "./cart-button";
 import { CategoryNav } from "./category-nav";
 import { MobileMenu } from "./mobile-menu";
@@ -29,7 +30,7 @@ export function SiteHeader() {
           <SearchBox className="flex-1" />
           <div className="flex items-center gap-7">
             <Action href="/track-order" icon={Truck} label="Track Order" />
-            <Action href="/account" icon={User} label="Account" />
+            <AccountButton />
             <CartButton withLabel />
             <MobileMenu trigger="more" />
           </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { bn, isBangla } from "@/lib/bn";
 import { cn } from "@/lib/utils";
 
 export type SectionHeaderProps = {
@@ -13,13 +14,15 @@ export type SectionHeaderProps = {
 };
 
 /** Figma: Section Header (Eyebrow / Title / Subtitle / View All). */
-export function SectionHeader({ eyebrow, title, subtitle, viewAll, tone = "default", className, as: H = "h2" }: SectionHeaderProps) {
+export function SectionHeader({ eyebrow: eyebrowRaw, title, subtitle: subtitleRaw, viewAll, tone = "default", className, as: H = "h2" }: SectionHeaderProps) {
+  const eyebrow = bn(eyebrowRaw);
+  const subtitle = bn(subtitleRaw);
   return (
     <div className={cn("flex items-end justify-between gap-6", className)}>
       <div className="flex min-w-0 flex-col gap-1.5">
         {eyebrow && <p className={cn("t-eyebrow", tone === "light" ? "text-orange-500" : "text-green-600")}>{eyebrow}</p>}
         <H className={cn("t-h2", tone === "light" ? "text-cream-100" : "text-ink")}>{title}</H>
-        {subtitle && <p className={cn("t-bn", tone === "light" ? "text-cream-100/80" : "text-ink-soft")}>{subtitle}</p>}
+        {subtitle && <p className={cn(isBangla(subtitle) ? "t-bn" : "t-body", tone === "light" ? "text-cream-100/80" : "text-ink-soft")}>{subtitle}</p>}
       </div>
       {viewAll && (
         <Link

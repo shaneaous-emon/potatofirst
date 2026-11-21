@@ -7,6 +7,7 @@ import { ChevronRight, Play } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/sheet";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import type { ImageAsset } from "@/types";
+import { Bn } from "@/components/common/bn";
 
 /** Figma: Review Reel Card — photo/video UGC, quote and product tag only. */
 export function ReviewReelCard({
@@ -49,7 +50,7 @@ export function ReviewReelCard({
           </DialogContent>
         </Dialog>
       )}
-      <p className="t-bn text-[15px] text-white">{quote}</p>
+      <Bn className="t-bn text-[15px] text-white">{quote}</Bn>
       {product && (
         <Link href={product.href} className="flex max-w-full items-center gap-2 self-start rounded-full bg-white/95 py-1 pl-1 pr-3 transition-colors hover:bg-white">
           <span className="relative size-[26px] shrink-0 overflow-hidden rounded-full">

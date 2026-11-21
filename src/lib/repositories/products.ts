@@ -84,3 +84,31 @@ export async function getProductReviews(productId: string): Promise<Review[]> {
   cacheTag(`reviews:${productId}`);
   return sampleReviewsFor(productId);
 }
+
+export type FilterFacets = { packSizes: string[]; price: { min: number; max: number } };
+
+/** grams for sorting pack labels like "100 g", "1 kg", "3 packs" */
+const packWeight = (label: string) => {
+  const m = label.match(/([\d.]+)\s*(kg|g)/i);
+  if (!m) return Number.MAX_SAFE_INTEGER;
+  return parseFloat(m[1]) * (m[2].toLowerCase() === "kg" ? 1000 : 1);
+};
+
+/**
+ * Filter options built from the catalogue (pack sizes, price bounds), so new
+ * products/categories extend the filters automatically.
+ * Phase 2: `GET /products/facets?category=…`.
+ */
+export async function getFilterFacets(scope: ProductQuery = {}): Promise<FilterFacets> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("products");
+  const list = applyQuery(mockProducts, { category: scope.category, tag: scope.tag });
+  const packs = [...new Set(list.flatMap((p) => p.variants.map((v) => v.label)))].sort((a, b) => packWeight(a) - packWeight(b) || a.localeCompare(b));
+  const prices = list.map(minPrice);
+  const step = 10;
+  return {
+    packSizes: packs,
+    price: prices.length ? { min: Math.floor(Math.min(...prices) / step) * step, max: Math.ceil(Math.max(...prices) / step) * step } : { min: 0, max: 0 },
+  };
+}

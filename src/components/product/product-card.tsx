@@ -21,7 +21,7 @@ export function ProductCard({ product, priority, className }: { product: Product
         className,
       )}
     >
-      <div className="relative aspect-[296/272] overflow-hidden bg-cream-100">
+      <div className="relative aspect-[296/272] overflow-hidden bg-cream-100 sm:aspect-[296/250]">
         <Link href={href} tabIndex={-1} aria-hidden>
           <Image
             src={product.images[0].src}

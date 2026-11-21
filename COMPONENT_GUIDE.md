@@ -92,3 +92,29 @@ Elements removed in the approved Figma (section eyebrows, story Bangla line, new
 ## Live search
 
 `SearchBox` (client) calls `GET /api/search?q=` (debounced 200 ms, min 2 chars) and shows up to 6 suggestions; Enter/"See all" opens `/search?q=`. Arrow keys + Enter select, Esc closes. Phase 2: point the route handler at Laravel `GET /products?q=`.
+
+## Site-wide switches (`src/content/site.ts → features`)
+
+| Switch | Default | Effect |
+|---|---|---|
+| `bangla` | `false` | Every Bangla secondary line (section subtitles, helper text, `English · বাংলা` halves) is hidden. Uses `bn()` / `<Bn>` from `lib/bn.ts`. Turn on to show them all again; per-section `hide` still applies. |
+| `wishlist.enabled` / `hoverOnly` | `false` / `true` | Heart buttons, menu link, `/wishlist`. |
+| `accounts` | on, Google + Facebook | Login / sign up / social buttons on `/account`. Guest checkout always works. |
+
+`announcement.messages` rotates in the top bar every `intervalMs`.
+
+## Page templates (`src/content/templates/index.ts`)
+
+Product page: `related` (header + hide keys), `quickFacts` (off), `shortDescription`. Cart: `upsell`. All copy is kept; only visibility changes.
+
+## Hero
+
+`hero.slides[]` (main slider, autoplay + drag + arrows on hover + dots) and `hero.side[]` (one = fixed). Recommended banner size 1720×880 (main), 792×880 (side).
+
+## Shop filters
+
+Pack sizes and price bounds come from `getFilterFacets()` (catalogue-driven). Categories show 6 then "Show more"; quick chips scroll with arrows when they overflow.
+
+## Product description
+
+`product.descriptionHtml` from the admin rich-text editor is rendered with `<RichText>` (headings, lists, links, images, tables). Sanitise on the server.

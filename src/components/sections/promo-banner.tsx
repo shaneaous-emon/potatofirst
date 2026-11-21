@@ -4,7 +4,9 @@ import { Package } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { SectionShell } from "./section-shell";
 import { isOn } from "./visibility";
+import { bn } from "@/lib/bn";
 import type { PromoBannerSection } from "./types";
+import { Bn } from "@/components/common/bn";
 
 /**
  * Figma: 07 Promotional Combo Banner — CMS image + editable copy.
@@ -22,14 +24,20 @@ export function PromoBanner({ hide, eyebrow, title, subtitle, cta, offerChip, im
           className="-z-10 object-cover object-[75%_center] max-md:opacity-40 md:object-right"
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-cream-100/95 via-cream-100/60 to-transparent max-md:bg-cream-100/40" />
-        <div className="flex min-h-[340px] max-w-[520px] flex-col justify-center gap-4 p-6 sm:p-10 md:min-h-[400px] lg:px-[72px]">
-          {eyebrow && isOn(hide, "eyebrow") && (
+        <div className="flex min-h-[340px] max-w-[620px] flex-col justify-center gap-4 p-6 sm:p-10 md:min-h-[400px] lg:px-[72px]">
+          {bn(eyebrow) && isOn(hide, "eyebrow") && (
             <p className="flex items-center gap-2 t-caption text-orange-600">
-              <Package className="size-[18px]" aria-hidden /> {eyebrow}
+              <Package className="size-[18px]" aria-hidden /> {bn(eyebrow)}
             </p>
           )}
-          <h2 className="t-display-m whitespace-pre-line text-brown-900">{title}</h2>
-          {subtitle && isOn(hide, "subtitle") && <p className="t-bn text-ink-soft">{subtitle}</p>}
+          <h2 className="t-display-m text-brown-900">
+            {title.split("\n").map((line) => (
+              <span key={line} className="block xs:whitespace-nowrap">
+                {line}
+              </span>
+            ))}
+          </h2>
+          {subtitle && isOn(hide, "subtitle") && <Bn className="t-bn text-ink-soft">{subtitle}</Bn>}
           <div className="flex flex-wrap items-center gap-3 pt-1 sm:gap-4">
             <Link href={cta.href} className={buttonVariants()}>
               {cta.label}

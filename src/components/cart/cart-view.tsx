@@ -11,6 +11,7 @@ import { selectCount, selectSubtotal, useCart } from "@/stores/cart";
 import { useHydrated } from "@/stores/use-hydrated";
 import { CartLineItem } from "./cart-line-item";
 import { PromoCode } from "./promo-code";
+import { Bn } from "@/components/common/bn";
 
 /** Figma: Cart page body (items table + order summary). */
 export function CartView() {
@@ -36,7 +37,7 @@ export function CartView() {
           <ShoppingBag className="size-9" />
         </span>
         <h2 className="t-h3 text-ink">Your cart is empty</h2>
-        <p className="t-bn text-ink-soft">পছন্দের স্ন্যাকস খুঁজে কার্টে যোগ করুন।</p>
+        <Bn className="t-bn text-ink-soft">পছন্দের স্ন্যাকস খুঁজে কার্টে যোগ করুন।</Bn>
         <Link href="/shop" className={buttonVariants()}>
           Start Shopping
         </Link>

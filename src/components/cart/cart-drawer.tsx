@@ -7,6 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import { selectCount, selectSubtotal, useCart } from "@/stores/cart";
 import { CartLineItem } from "./cart-line-item";
+import { Bn } from "@/components/common/bn";
 
 /** Figma: Added to Cart — Drawer (overlay). Global, opened from anywhere via the cart store. */
 export function CartDrawer() {
@@ -32,7 +33,7 @@ export function CartDrawer() {
               <ShoppingBag className="size-7" />
             </span>
             <p className="t-h4 text-ink">Your cart is empty</p>
-            <p className="t-bn-s text-ink-soft">পছন্দের স্ন্যাকস কার্টে যোগ করুন</p>
+            <Bn className="t-bn-s text-ink-soft">পছন্দের স্ন্যাকস কার্টে যোগ করুন</Bn>
             <Link href="/shop" onClick={close} className={buttonVariants()}>
               Start Shopping
             </Link>

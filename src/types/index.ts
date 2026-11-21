@@ -39,6 +39,9 @@ export type Product = {
   categoryName: string;
   subCategory?: string;
   shortDescription: string;
+  shortDescriptionBn?: string;
+  /** Sanitised HTML from the admin rich-text editor */
+  descriptionHtml?: string;
   description: string[];
   highlights: string[];
   facts: { label: string; value: string }[];
@@ -57,6 +60,7 @@ export type Category = {
   name: string;
   nameBn: string;
   description: string;
+  descriptionBn?: string;
   image: ImageAsset;
   banner: ImageAsset;
   subCategories: { slug: string; label: string }[];

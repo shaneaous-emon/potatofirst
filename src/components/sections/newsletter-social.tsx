@@ -6,6 +6,7 @@ import { NewsletterForm } from "./newsletter-form";
 import { SectionShell } from "./section-shell";
 import { isOn } from "./visibility";
 import type { NewsletterSection } from "./types";
+import { Bn } from "@/components/common/bn";
 
 function SocialButton({ label, href, children }: { label: string; href: string | null; children: React.ReactNode }) {
   const cls = "inline-flex items-center gap-2 rounded-sm border-[1.5px] border-brown-700 px-5 py-3 t-button text-brown-700 transition-colors hover:bg-brown-700 hover:text-cream-100";
@@ -33,12 +34,12 @@ export function NewsletterSocial({ hide, newsletter, social, spacingTop = "none"
             <Mail />
           </IconCircle>
           <h2 className="t-h2 text-ink">{newsletter.title}</h2>
-          <p className="t-bn text-ink-soft">{newsletter.subtitle}</p>
+          <Bn className="t-bn text-ink-soft">{newsletter.subtitle}</Bn>
           <NewsletterForm />
         </div>}
         {isOn(hide, "social") && <div className="flex flex-col gap-4 rounded-lg border border-line bg-white p-6 sm:p-12">
           <h2 className="t-h2 text-ink">{social.title}</h2>
-          <p className="t-bn text-ink-soft">{social.subtitle}</p>
+          <Bn className="t-bn text-ink-soft">{social.subtitle}</Bn>
           {isOn(hide, "socialImages") && <ul className="grid grid-cols-4 gap-2 sm:gap-3">
             {social.images.map((img, i) => (
               <li key={i} className="relative aspect-square overflow-hidden rounded-[12px]">

@@ -28,10 +28,16 @@ type Base = {
 export type Link = { label: string; href: string };
 export type Header = { eyebrow?: string; title: string; subtitle?: string; viewAll?: { label?: string; href: string } };
 
+export type HeroSlide = { image: ImageAsset; mobileImage?: ImageAsset; href: string };
+
+/** hide keys: side */
 export type HeroSection = Base & {
   type: "hero";
-  main: { image: ImageAsset; mobileImage?: ImageAsset; href: string };
-  side?: { image: ImageAsset; href: string };
+  /** Main banner slides (1 = static). Auto-advance every `intervalMs`. */
+  slides: HeroSlide[];
+  /** Side banner(s). One slide = fixed; more = its own slider. */
+  side?: HeroSlide[];
+  intervalMs?: number;
 };
 
 export type TrustSection = Base & {
@@ -93,7 +99,7 @@ export type ReviewReelsSection = Base & {
 export type NewsletterSection = Base & {
   type: "newsletter";
   newsletter: { title: string; subtitle: string };
-  social: { title: string; subtitle: string; images: ImageAsset[] };
+  social: { title: string; subtitle: string; subtitleBn?: string; images: ImageAsset[] };
 };
 
 export type FaqSection = Base & {

@@ -8,7 +8,6 @@ export const SORT_OPTIONS: { value: ProductSort; label: string }[] = [
   { value: "price-asc", label: "Price: Low to High" },
   { value: "price-desc", label: "Price: High to Low" },
 ];
-export const PACK_SIZES = ["100 g", "200 g", "250 g", "500 g", "1 kg"];
 const TAGS: ProductTag[] = ["bestseller", "new", "popular", "offer"];
 
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);

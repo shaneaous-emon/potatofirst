@@ -4,40 +4,44 @@ import { ArrowRight, Check, Package, Truck } from "lucide-react";
 import { IconCircle } from "@/components/common/icon-circle";
 import { Stars } from "@/components/common/stars";
 import { site } from "@/content/site";
+import { productTemplate } from "@/content/templates";
+import { RichText } from "@/components/common/rich-text";
+import { ReviewUploadDialog } from "@/components/reviews/review-upload-dialog";
 import { formatPrice } from "@/lib/utils";
 import type { Product, Review } from "@/types";
+import { Bn } from "@/components/common/bn";
 
 export function DescriptionPanel({ product }: { product: Product }) {
+  const showFacts = productTemplate.quickFacts.enabled;
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px] lg:gap-14">
-      {/* Rich text from CMS */}
-      <div className="flex flex-col gap-3.5">
-        {product.description.map((p) => (
-          <p key={p} className={/[\u0980-\u09FF]/.test(p) ? "t-bn text-ink-soft" : "t-body-l text-ink-soft"}>
-            {p}
-          </p>
-        ))}
-        <ul className="flex flex-col gap-2.5 pt-1">
-          {product.highlights.map((h) => (
-            <li key={h} className="flex items-center gap-2.5 t-body text-ink">
-              <Check className="size-[18px] shrink-0 text-green-600" aria-hidden /> {h}
-            </li>
+    <div className={showFacts ? "grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px] lg:gap-14" : "max-w-[860px]"}>
+      {/* Rich text from the admin editor */}
+      {product.descriptionHtml ? (
+        <RichText html={product.descriptionHtml} />
+      ) : (
+        <div className="flex flex-col gap-3.5">
+          {product.description.map((p) => (
+            <Bn key={p} className="t-body-l text-ink-soft">
+              {p}
+            </Bn>
           ))}
-        </ul>
-      </div>
-      <dl className="flex flex-col gap-3 self-start rounded-md border border-line bg-white p-6">
-        <p className="t-h4 text-ink">Quick Facts</p>
-        <div className="flex justify-between gap-4">
-          <dt className="t-body-s text-ink-muted">Pack size</dt>
-          <dd className="t-label text-ink">{product.variants.map((v) => v.label).join(" / ")}</dd>
         </div>
-        {product.facts.map((f) => (
-          <div key={f.label} className="flex justify-between gap-4">
-            <dt className="t-body-s text-ink-muted">{f.label}</dt>
-            <dd className="text-right t-label text-ink">{f.value}</dd>
+      )}
+      {showFacts && (
+        <dl className="flex flex-col gap-3 self-start rounded-md border border-line bg-white p-6">
+          <p className="t-h4 text-ink">Quick Facts</p>
+          <div className="flex justify-between gap-4">
+            <dt className="t-body-s text-ink-muted">Pack size</dt>
+            <dd className="t-label text-ink">{product.variants.map((v) => v.label).join(" / ")}</dd>
           </div>
-        ))}
-      </dl>
+          {product.facts.map((f) => (
+            <div key={f.label} className="flex justify-between gap-4">
+              <dt className="t-body-s text-ink-muted">{f.label}</dt>
+              <dd className="text-right t-label text-ink">{f.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
     </div>
   );
 }
@@ -48,9 +52,12 @@ export function ReviewsPanel({ product, reviews }: { product: Product; reviews: 
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="t-h3 text-ink">What customers say</h2>
-        <Link href="/contact?subject=review" className="inline-flex h-10 items-center rounded-sm border-[1.5px] border-brown-700 px-4 t-button text-brown-700 hover:bg-brown-700 hover:text-cream-100">
-          Write a Review
-        </Link>
+        <ReviewUploadDialog
+          products={[{ id: product.id, name: product.name }]}
+          defaultProductId={product.id}
+          label="Write a Review"
+          triggerClassName="inline-flex h-10 cursor-pointer items-center rounded-sm border-[1.5px] border-brown-700 px-4 t-button text-brown-700 transition-colors hover:bg-brown-700 hover:text-cream-100"
+        />
       </div>
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[360px_1fr]">
         <div className="flex flex-col gap-3.5 self-start rounded-md border border-line bg-white p-7">
@@ -88,7 +95,7 @@ export function ReviewsPanel({ product, reviews }: { product: Product; reviews: 
                 </div>
                 <span className="t-caption text-ink-muted">{r.date}</span>
               </div>
-              <p className="t-bn text-ink-soft">{r.body}</p>
+              <Bn className="t-bn text-ink-soft">{r.body}</Bn>
               {r.image && (
                 <span className="relative size-[88px] overflow-hidden rounded-sm">
                   <Image src={r.image.src} alt="Customer photo" fill sizes="88px" className="object-cover" />
@@ -113,7 +120,7 @@ export function DeliveryPanel() {
           </IconCircle>
           <div>
             <h3 className="t-h4 text-ink">Delivery</h3>
-            <p className="t-bn-s text-ink-soft">ডেলিভারি চার্জ ও সময়</p>
+            <Bn className="t-bn-s text-ink-soft">ডেলিভারি চার্জ ও সময়</Bn>
           </div>
         </div>
         <table className="w-full overflow-hidden rounded-sm text-left outline outline-1 outline-line">
@@ -149,7 +156,7 @@ export function DeliveryPanel() {
           </IconCircle>
           <div>
             <h3 className="t-h4 text-ink">Returns &amp; Refunds</h3>
-            <p className="t-bn-s text-ink-soft">রিটার্ন ও রিফান্ড নীতি</p>
+            <Bn className="t-bn-s text-ink-soft">রিটার্ন ও রিফান্ড নীতি</Bn>
           </div>
         </div>
         {[

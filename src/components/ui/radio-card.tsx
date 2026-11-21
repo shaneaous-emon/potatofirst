@@ -3,6 +3,7 @@
 import * as React from "react";
 import { RadioGroup as RadioPrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
+import { Bn } from "@/components/common/bn";
 
 export const RadioGroup = RadioPrimitive.Root;
 
@@ -34,7 +35,7 @@ export function RadioCard({
       {icon}
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="t-label text-ink">{title}</span>
-        {description && <span className="t-bn-s text-ink-soft">{description}</span>}
+        {description && <Bn as="span" className="t-bn-s text-ink-soft">{description}</Bn>}
       </span>
       {trailing && <span className="t-label shrink-0 text-ink">{trailing}</span>}
     </RadioPrimitive.Item>

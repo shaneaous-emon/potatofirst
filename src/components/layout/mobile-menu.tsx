@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { ChevronRight, Heart, Leaf, Menu, Phone, Truck, User } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { mainNav, site } from "@/content/site";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/stores/auth";
+import { SearchBox } from "./search-box";
 
 const ALL_QUICK = [
   { icon: Truck, label: "Track Order", href: "/track-order" },
@@ -19,8 +22,10 @@ const QUICK = ALL_QUICK.filter((q) => q.href !== "/wishlist" || site.features.wi
 
 /** Figma: Mobile Menu Drawer — 390. Also used as the desktop "More" menu. */
 export function MobileMenu({ trigger = "icon" }: { trigger?: "icon" | "more" }) {
+  const [open, setOpen] = useState(false);
+  const user = useAuth((s) => s.user);
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         {trigger === "icon" ? (
           <button type="button" aria-label="Open menu" className="grid size-10 cursor-pointer place-items-center rounded-full text-ink hover:bg-cream-100">
@@ -33,7 +38,13 @@ export function MobileMenu({ trigger = "icon" }: { trigger?: "icon" | "more" }) 
           </button>
         )}
       </SheetTrigger>
-      <SheetContent side={trigger === "icon" ? "left" : "right"} className="overflow-y-auto">
+      <SheetContent
+        side={trigger === "icon" ? "left" : "right"}
+        className="overflow-y-auto"
+        onClickCapture={(e) => {
+          if ((e.target as HTMLElement).closest("a[href]")) setOpen(false);
+        }}
+      >
         <SheetTitle className="sr-only">Menu</SheetTitle>
         <SheetDescription className="sr-only">Browse categories and quick links</SheetDescription>
         <div className="px-4 py-3.5">
@@ -42,14 +53,17 @@ export function MobileMenu({ trigger = "icon" }: { trigger?: "icon" | "more" }) 
           </SheetClose>
         </div>
         <div className="px-4 pb-3">
+          <SearchBox compact onNavigate={() => setOpen(false)} />
+        </div>
+        <div className="px-4 pb-3">
           <SheetClose asChild>
-            <Link href="/account" className="flex items-center gap-3 rounded-md bg-orange-500 px-4 py-3.5 text-brown-900">
+            <Link href="/account" className="flex items-center gap-3 rounded-md bg-orange-500 px-4 py-3.5 text-brown-900 transition-colors hover:bg-orange-600">
               <span className="grid size-10 place-items-center rounded-full bg-white text-orange-600">
                 <User className="size-[22px]" />
               </span>
               <span>
-                <span className="block t-h4">Hello there!</span>
-                <span className="block t-body-s">Sign in / Register</span>
+                <span className="block t-h4">{user ? `Hi, ${user.name.split(" ")[0]}!` : "Hello there!"}</span>
+                <span className="block t-body-s">{user ? "View my account" : "Log in / Sign up"}</span>
               </span>
             </Link>
           </SheetClose>

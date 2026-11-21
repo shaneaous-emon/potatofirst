@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { site } from "@/content/site";
-import { trackOrder, type TrackingStep } from "@/lib/services/orders";
+import { trackOrder } from "@/lib/services/orders";
 import { cn } from "@/lib/utils";
 import { trackSchema, type TrackValues } from "@/lib/validation/schemas";
 
@@ -18,7 +18,7 @@ const ICONS = { placed: CheckCircle2, confirmed: Phone, packed: Package, shipped
 /** Figma: Track Order (form + timeline result). */
 export function TrackOrderForm() {
   const presetId = useSearchParams().get("id") ?? "";
-  const [result, setResult] = useState<{ orderId: string; steps: TrackingStep[] } | null>(null);
+  const [result, setResult] = useState<Awaited<ReturnType<typeof trackOrder>> | null>(null);
   const { register, handleSubmit, formState } = useForm<TrackValues>({ resolver: zodResolver(trackSchema), defaultValues: { orderId: presetId, phone: "" } });
   const e = formState.errors;
 
@@ -26,14 +26,17 @@ export function TrackOrderForm() {
     <div className="flex flex-col gap-8">
       <form
         noValidate
-        onSubmit={handleSubmit(async (v) => setResult(await trackOrder(v.orderId.replace("#", "").toUpperCase())))}
-        className="grid grid-cols-1 items-start gap-4 rounded-md border border-line bg-white p-5 sm:grid-cols-[1fr_1fr_auto] sm:p-6"
+        onSubmit={handleSubmit(async (v) =>
+          setResult(await trackOrder({ orderId: v.orderId ? v.orderId.replace("#", "").toUpperCase() : undefined, phone: v.phone || undefined })),
+        )}
+        className="grid grid-cols-1 items-start gap-4 rounded-md border border-line bg-white p-5 sm:grid-cols-[1fr_auto_1fr_auto] sm:p-6"
       >
-        <FormField id="orderId" label="Order ID" required error={e.orderId?.message}>
+        <FormField id="orderId" label="Order ID" error={e.orderId?.message}>
           <Input id="orderId" placeholder="#PF-000000" aria-invalid={!!e.orderId} {...register("orderId")} />
         </FormField>
-        <FormField id="track-phone" label="Phone Number" required error={e.phone?.message}>
-          <Input id="track-phone" type="tel" inputMode="tel" placeholder="01XXX-XXXXXX" aria-invalid={!!e.phone} {...register("phone")} />
+        <span className="self-center text-center t-label text-ink-muted sm:mt-7">or</span>
+        <FormField id="track-phone" label="Phone Number" error={e.phone?.message}>
+          <Input id="track-phone" type="tel" inputMode="tel" placeholder="01XXXXXXXXX" aria-invalid={!!e.phone} {...register("phone")} />
         </FormField>
         <Button type="submit" size="lg" className="h-12 sm:mt-7" disabled={formState.isSubmitting}>
           {formState.isSubmitting ? <Loader2 className="animate-spin" /> : null} Track
@@ -45,6 +48,7 @@ export function TrackOrderForm() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="t-h3 text-ink">Order #{result.orderId}</h2>
+              {result.lookup === "phone" && <p className="t-body-s text-ink-soft">Latest order for {result.phone}</p>}
               <p className="t-body-s text-ink-muted">Demo status — live tracking connects to the backend in phase 2.</p>
             </div>
             <span className="rounded-full bg-orange-100 px-3.5 py-1.5 t-label text-orange-600">On the way</span>
