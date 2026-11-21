@@ -1,17 +1,12 @@
 import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { customerSecret } from "@/lib/secrets";
 
 const COOKIE_NAME = "pf_customer";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
-function secret() {
-  const s =
-    process.env.CUSTOMER_SESSION_SECRET ||
-    process.env.ADMIN_SESSION_SECRET ||
-    "potatofirst_customer_jwt_session_secret_key_minimum_32_chars_long_2026";
-  return new TextEncoder().encode(s);
-}
+const secret = customerSecret;
 
 export type CustomerJwtPayload = {
   id: number;

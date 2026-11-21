@@ -3,7 +3,8 @@
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { db, t } from "@/db";
+import { db, hasDatabase, t } from "@/db";
+import { MissingSecretError } from "@/lib/secrets";
 import { getAdmin, logActivity } from "@/lib/admin/auth";
 import { clientIp, createSession, destroySession } from "@/lib/admin/session";
 import type { ActionResult } from "@/components/admin/action-form";
@@ -16,6 +17,10 @@ export async function loginAction(_: ActionResult, form: FormData): Promise<Acti
     const email = String(form.get("email") ?? "").trim().toLowerCase();
     const password = String(form.get("password") ?? "");
     if (!email || !password) return { ok: false, message: "Enter your email and password" };
+    if (!hasDatabase) {
+      console.error("Admin login: DATABASE_URL is not set on the server");
+      return { ok: false, message: "Server is not connected to the database (DATABASE_URL missing). Contact the site developer." };
+    }
 
     const generic = { ok: false, message: "Email or password is incorrect" };
 
@@ -54,6 +59,9 @@ export async function loginAction(_: ActionResult, form: FormData): Promise<Acti
       await db().insert(t.activityLogs).values({ adminId: u.id, action: "login", entity: "auth", summary: `${u.name} logged in`, ip: await clientIp() });
     } catch (sessionErr) {
       console.error("Failed to create session / update login:", sessionErr);
+      if (sessionErr instanceof MissingSecretError) {
+        return { ok: false, message: "Server setup incomplete: ADMIN_SESSION_SECRET is missing. Contact the site developer." };
+      }
       return { ok: false, message: "Failed to establish login session. Please try again." };
     }
 

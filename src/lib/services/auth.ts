@@ -4,6 +4,7 @@ import {
   loginCustomerAction,
   logoutCustomerAction,
   getCurrentCustomerAction,
+  getSocialProvidersAction,
 } from "@/app/(store)/account/actions";
 
 export async function registerCustomer(v: {
@@ -30,20 +31,9 @@ export async function loginCustomer(v: {
   return res.customer;
 }
 
-export async function socialLogin(provider: "google" | "facebook"): Promise<Customer> {
-  // Social login simulation connecting with database/session
-  const name = provider === "google" ? "Google User" : "Facebook User";
-  const email = `${provider}_user@potatofirst.com`;
-  const res = await registerCustomerAction({
-    name,
-    phone: `017${Math.floor(10000000 + Math.random() * 89999999)}`,
-    email,
-    password: `SocialAuth_${Math.random().toString(36).slice(2)}`,
-  });
-  if (res.customer) {
-    return { ...res.customer, provider };
-  }
-  return { id: `CU-${Date.now()}`, name, provider };
+/** Starts real Google / Facebook OAuth: the browser leaves the site and returns to /account. */
+export function socialLogin(provider: "google" | "facebook") {
+  window.location.href = `/api/auth/${provider}`;
 }
 
 export async function logoutCustomer() {
@@ -52,4 +42,8 @@ export async function logoutCustomer() {
 
 export async function getSessionCustomer(): Promise<Customer | null> {
   return getCurrentCustomerAction();
+}
+
+export async function getSocialProviders() {
+  return getSocialProvidersAction();
 }

@@ -34,6 +34,7 @@ import {
   logoutCustomer,
   registerCustomer,
   socialLogin,
+  getSocialProviders,
 } from "@/lib/services/auth";
 import { parseOrder, readLastOrderRaw } from "@/lib/services/orders";
 import { cn, formatPrice } from "@/lib/utils";
@@ -46,22 +47,45 @@ import {
 import { useAuth, type Customer } from "@/stores/auth";
 import { useHydrated } from "@/stores/use-hydrated";
 
+const AUTH_ERRORS: Record<string, string> = {
+  unavailable: "This sign-in option is not available right now.",
+  cancelled: "Sign-in was cancelled.",
+  state: "Sign-in session expired. Please try again.",
+  blocked: "This account has been suspended. Please contact support.",
+  no_email: "Facebook did not share your email address. Please allow email access or sign up with your phone.",
+  failed: "Sign-in failed. Please try again.",
+};
+
 /** My Account: login / sign up (incl. Google & Facebook) or the customer dashboard. */
 export function AccountView() {
   const hydrated = useHydrated();
   const user = useAuth((s) => s.user);
   const setUser = useAuth((s) => s.setUser);
 
-  // Sync session on mount
+  // The server session (httpOnly cookie) is the source of truth; localStorage only mirrors it.
   useEffect(() => {
     getSessionCustomer()
       .then((activeUser) => {
-        if (activeUser && (!user || user.id !== activeUser.id)) {
+        const current = useAuth.getState().user;
+        if (!activeUser) {
+          if (current) setUser(null);
+        } else if (!current || current.id !== activeUser.id) {
           setUser(activeUser);
         }
       })
       .catch(() => null);
-  }, [user, setUser]);
+  }, [setUser]);
+
+  // Result of a Google / Facebook redirect
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    const signedIn = sp.get("signed_in");
+    const err = sp.get("auth_error");
+    if (!signedIn && !err) return;
+    if (signedIn) toast.success(`Signed in with ${signedIn === "google" ? "Google" : "Facebook"}`);
+    if (err) toast.error(AUTH_ERRORS[err] ?? AUTH_ERRORS.failed);
+    window.history.replaceState(null, "", window.location.pathname);
+  }, []);
 
   if (!hydrated) return <Skeleton className="h-[520px] w-full rounded-lg" />;
   return user ? <Dashboard user={user} /> : <AuthPanel />;
@@ -132,7 +156,14 @@ function AuthPanel() {
   const [tab, setTab] = useState<"login" | "register">("login");
   const [social, setSocial] = useState<"google" | "facebook" | null>(null);
   const setUser = useAuth((s) => s.setUser);
-  const providers = site.features.accounts.social;
+  const [enabled, setEnabled] = useState({ google: false, facebook: false });
+  useEffect(() => {
+    getSocialProviders().then(setEnabled).catch(() => null);
+  }, []);
+  const providers = {
+    google: site.features.accounts.social.google && enabled.google,
+    facebook: site.features.accounts.social.facebook && enabled.facebook,
+  };
 
   const done = (u: Customer, msg: string) => {
     setUser(u);
@@ -168,16 +199,9 @@ function AuthPanel() {
                 size="lg"
                 className="border-line text-ink hover:border-ink hover:bg-cream-50 hover:text-ink"
                 disabled={!!social}
-                onClick={async () => {
+                onClick={() => {
                   setSocial("google");
-                  try {
-                    const u = await socialLogin("google");
-                    done(u, "Signed in with Google");
-                  } catch (e) {
-                    toast.error(e instanceof Error ? e.message : "Google sign in failed");
-                  } finally {
-                    setSocial(null);
-                  }
+                  socialLogin("google");
                 }}
               >
                 {social === "google" ? <Loader2 className="animate-spin" /> : <GoogleIcon />} Continue with Google
@@ -189,16 +213,9 @@ function AuthPanel() {
                 size="lg"
                 className="border-line text-ink hover:border-[#1877F2] hover:bg-[#1877F2] hover:text-white"
                 disabled={!!social}
-                onClick={async () => {
+                onClick={() => {
                   setSocial("facebook");
-                  try {
-                    const u = await socialLogin("facebook");
-                    done(u, "Signed in with Facebook");
-                  } catch (e) {
-                    toast.error(e instanceof Error ? e.message : "Facebook sign in failed");
-                  } finally {
-                    setSocial(null);
-                  }
+                  socialLogin("facebook");
                 }}
               >
                 {social === "facebook" ? <Loader2 className="animate-spin" /> : <FacebookIcon />} Continue with Facebook
