@@ -18,7 +18,7 @@ import {
   bigint,
 } from "drizzle-orm/mysql-core";
 
-const id = () => serial("id").primaryKey();
+const id = () => bigint("id", { mode: "number", unsigned: true }).autoincrement().primaryKey();
 const fk = (name: string) => bigint(name, { mode: "number", unsigned: true });
 const created = () => timestamp("created_at").notNull().defaultNow();
 const updated = () => timestamp("updated_at").notNull().defaultNow().onUpdateNow();

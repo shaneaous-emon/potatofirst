@@ -24,7 +24,29 @@ export function deliveryChargeFor(area: DeliveryArea) {
   return site.delivery[area].charge;
 }
 
+import { createStoreOrderAction } from "@/app/(store)/checkout/actions";
+
 export async function placeOrder(input: PlaceOrderInput): Promise<Order> {
+  try {
+    const res = await createStoreOrderAction({
+      customer: input.customer,
+      deliveryArea: input.deliveryArea,
+      paymentMethod: input.paymentMethod,
+      note: input.note,
+      lines: input.lines,
+      discount: input.discount,
+    });
+    if (res.ok && res.order) {
+      sessionStorage.setItem(KEY, JSON.stringify(res.order));
+      return res.order;
+    }
+    if (res.error) {
+      console.warn("DB order placement response:", res.error);
+    }
+  } catch (err) {
+    console.warn("Server order placement failed, using fallback:", err);
+  }
+
   const subtotal = input.lines.reduce((s, l) => s + l.price * l.quantity, 0);
   const deliveryCharge = deliveryChargeFor(input.deliveryArea);
   const order: Order = {
