@@ -43,6 +43,11 @@ export function ActionForm({
       }}
     >
       {children}
+      {state && !state.ok && state.message && (
+        <div className="mt-3 rounded-sm bg-red-50 p-3 text-[13px] font-medium text-red-600 border border-red-200" role="alert">
+          {state.message}
+        </div>
+      )}
       {state && !state.ok && state.errors && (
         <ul className="mt-3 flex flex-col gap-1 rounded-sm bg-sale/10 px-3 py-2 text-[13px] text-sale" role="alert">
           {Object.entries(state.errors).map(([k, v]) => (

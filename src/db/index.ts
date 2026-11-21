@@ -16,7 +16,7 @@ export function db(): DB {
     g.__pfPool = mysql.createPool({
       uri: process.env.DATABASE_URL,
       connectionLimit: Number(process.env.DB_POOL_SIZE ?? 5),
-      timezone: "Z",
+      timezone: "+00:00",
       ssl: process.env.DATABASE_SSL === "true" ? { rejectUnauthorized: true } : undefined,
     });
     g.__pfDb = drizzle(g.__pfPool, { schema, mode: "default" });

@@ -1,7 +1,11 @@
-import { Suspense } from "react";
+import { connection } from "next/server";
 import { LoginForm } from "./login-form";
 
-export default function AdminLoginPage() {
+export default async function AdminLoginPage(props: { searchParams?: Promise<{ next?: string }> }) {
+  await connection();
+  const sp = props.searchParams ? await props.searchParams : undefined;
+  const next = sp?.next && sp.next.startsWith("/admin") ? sp.next : "/admin";
+
   return (
     <div className="grid min-h-dvh place-items-center bg-brown-900 px-4 py-10">
       <div className="w-full max-w-[400px] rounded-lg bg-white p-7 shadow-pop sm:p-9">
@@ -12,9 +16,7 @@ export default function AdminLoginPage() {
             <p className="text-[13px] text-ink-muted">Sign in to manage your store</p>
           </div>
         </div>
-        <Suspense>
-          <LoginForm />
-        </Suspense>
+        <LoginForm next={next} />
       </div>
     </div>
   );
