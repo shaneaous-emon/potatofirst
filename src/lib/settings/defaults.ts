@@ -69,7 +69,7 @@ export const SETTINGS_DEFAULTS = {
   ai: {
     enabled: true,
     provider: "gemini" as string,
-    model: "gemini-2.5-flash",
+    model: "gemini-3.8-flash",
     /** false = the assistant asks for a click before changing anything; true = it just does it */
     autoExecute: false,
     /** provider id → API key (never sent to the browser) */

@@ -24,7 +24,8 @@ export const PROVIDERS: Provider[] = [
     keyUrl: "https://aistudio.google.com/apikey",
     env: "GEMINI_API_KEY",
     models: [
-      { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash (free)" },
+      { id: "gemini-3.8-flash", label: "Gemini 3.8 Flash (free, recommended)" },
+      { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash (older — may be unavailable to new users)" },
       { id: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash-Lite (free, fastest)" },
       { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro (free, low limits)" },
       { id: "gemini-2.0-flash", label: "Gemini 2.0 Flash (free)" },

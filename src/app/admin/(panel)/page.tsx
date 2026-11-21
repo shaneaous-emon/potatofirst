@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { and, count, desc, eq, gte, inArray, sql } from "drizzle-orm";
 import { Banknote, Boxes, CircleDollarSign, ClipboardList, Clock, PackageCheck, Plus, ShoppingBag, ShoppingCart, TrendingUp, Users, Package, Wallet } from "lucide-react";
-import { OrderStatusSelect } from "@/components/admin/order-status-select";
-import { Badge, Card, Forbidden, PageHeader, StatCard, Table, Td, btn, fmtDate, taka } from "@/components/admin/ui";
+import { Card, Forbidden, OrderStatusBadge, PageHeader, StatCard, Table, Td, btn, fmtDate, taka } from "@/components/admin/ui";
 import { db, t } from "@/db";
 import { requireAdmin } from "@/lib/admin/auth";
 import { can } from "@/lib/admin/permissions";
 import { SALE_STATUSES } from "@/lib/admin/queries/stats";
-import { reachableStatuses } from "@/lib/services/orders.server";
 
 export const metadata = { title: "Dashboard" };
 
@@ -102,7 +100,9 @@ export default async function Dashboard() {
                   <span className="block text-[12px] text-ink-muted">{o.phone}</span>
                 </Td>
                 <Td className="whitespace-nowrap font-medium">{taka(o.total)}</Td>
-                <Td>{editable ? <OrderStatusSelect key={`${o.id}-${o.status}`} orderId={o.id} status={o.status} options={reachableStatuses(o.status)} /> : <Badge>{o.status}</Badge>}</Td>
+                <Td>
+                  <OrderStatusBadge status={o.status} />
+                </Td>
                 <Td className="whitespace-nowrap text-[13px] text-ink-muted">{fmtDate(o.createdAt)}</Td>
               </tr>
             ))}

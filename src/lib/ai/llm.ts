@@ -185,16 +185,21 @@ export async function callModel(
   let lastErr: AiError | null = null;
   for (const provider of order) {
     const isPrimary = provider.id === settings.provider;
-    const model = isPrimary && settings.model ? settings.model : provider.models[0]?.id;
-    if (!model) continue;
-    const cfg: Cfg = { provider, model, apiKey: keyFor(provider), baseUrl: provider.id === "custom" ? settings.customBaseUrl : undefined };
-    try {
-      const fn = provider.kind === "gemini" ? gemini : provider.kind === "anthropic" ? anthropic : openai;
-      return { reply: await fn(cfg, system, turns, tools), used: `${provider.name} · ${model}` };
-    } catch (e) {
-      const err = e instanceof AiError ? e : new AiError(e instanceof Error ? e.message : "AI request failed", 500, false);
-      lastErr = err;
-      if (!err.retryable) throw err;
+    const chosen = isPrimary && settings.model ? settings.model : provider.models[0]?.id;
+    if (!chosen) continue;
+    // same provider, other models next: a busy model (503) is often fine on a sibling model
+    const models = [chosen, ...provider.models.map((m) => m.id).filter((m) => m !== chosen)].slice(0, 3);
+    for (const model of models) {
+      const cfg: Cfg = { provider, model, apiKey: keyFor(provider), baseUrl: provider.id === "custom" ? settings.customBaseUrl : undefined };
+      try {
+        const fn = provider.kind === "gemini" ? gemini : provider.kind === "anthropic" ? anthropic : openai;
+        return { reply: await fn(cfg, system, turns, tools), used: `${provider.name} · ${model}` };
+      } catch (e) {
+        const err = e instanceof AiError ? e : new AiError(e instanceof Error ? e.message : "AI request failed", 500, false);
+        lastErr = err;
+        if (!err.retryable) throw err;
+        if (err.status === 401 || err.status === 403) break; // bad key — other models of this provider won't help
+      }
     }
   }
   throw lastErr ?? new AiError("AI request failed", 500);
