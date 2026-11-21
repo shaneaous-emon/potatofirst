@@ -47,6 +47,8 @@ export const site = {
      * hide individual elements with `hide: [...]`.
      */
     bangla: false,
+    /** Mobile header extras under the logo bar (both are also inside the menu). */
+    mobileHeader: { search: false, categoryChips: false },
     /** Customer accounts (login / sign up / social login). */
     accounts: { enabled: true, social: { google: true, facebook: true } },
   },

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Truck } from "lucide-react";
 import { Logo } from "@/components/common/logo";
-import { mainNav } from "@/content/site";
+import { mainNav, site } from "@/content/site";
 import { AnnouncementBar } from "./announcement-bar";
 import { AccountButton } from "./account-button";
 import { CartButton } from "./cart-button";
@@ -9,11 +9,27 @@ import { CategoryNav } from "./category-nav";
 import { MobileMenu } from "./mobile-menu";
 import { SearchBox } from "./search-box";
 
-function Action({ href, icon: I, label }: { href: string; icon: typeof Truck; label: string }) {
+function Action({
+  href,
+  icon: I,
+  label,
+}: {
+  href: string;
+  icon: typeof Truck;
+  label: string;
+}) {
   return (
-    <Link href={href} className="group flex flex-col items-center gap-1 text-ink">
-      <I className="size-6 transition-colors group-hover:text-brown-700" aria-hidden />
-      <span className="t-caption text-ink-soft group-hover:text-brown-700">{label}</span>
+    <Link
+      href={href}
+      className="group flex flex-col items-center gap-1 text-ink"
+    >
+      <I
+        className="size-6 transition-colors group-hover:text-brown-700"
+        aria-hidden
+      />
+      <span className="t-caption text-ink-soft group-hover:text-brown-700">
+        {label}
+      </span>
     </Link>
   );
 }
@@ -45,22 +61,33 @@ export function SiteHeader() {
           <CartButton />
         </div>
       </header>
-      <div className="bg-white lg:hidden">
-        <div className="container-site pb-2.5 pt-2.5">
-          <SearchBox compact />
+      {site.features.mobileHeader.search && (
+        <div className="bg-white lg:hidden">
+          <div className="container-site pb-2.5 pt-2.5">
+            <SearchBox compact />
+          </div>
         </div>
-      </div>
-      <nav aria-label="Categories" className="scrollbar-none flex gap-2 overflow-x-auto bg-cream-50 px-4 py-3 lg:hidden">
-        {mainNav.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={item.highlight ? "shrink-0 rounded-full bg-orange-500 px-3.5 py-[7px] t-label text-brown-900" : "shrink-0 rounded-full border border-line bg-white px-3.5 py-[7px] t-label text-ink-soft hover:border-brown-700"}
-          >
-            {item.highlight ? `🔥 ${item.label}` : item.label}
-          </Link>
-        ))}
-      </nav>
+      )}
+      {site.features.mobileHeader.categoryChips && (
+        <nav
+          aria-label="Categories"
+          className="scrollbar-none flex gap-2 overflow-x-auto bg-cream-50 px-4 py-3 lg:hidden"
+        >
+          {mainNav.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={
+                item.highlight
+                  ? "shrink-0 rounded-full bg-orange-500 px-3.5 py-[7px] t-label text-brown-900"
+                  : "shrink-0 rounded-full border border-line bg-white px-3.5 py-[7px] t-label text-ink-soft hover:border-brown-700"
+              }
+            >
+              {item.highlight ? `🔥 ${item.label}` : item.label}
+            </Link>
+          ))}
+        </nav>
+      )}
     </>
   );
 }
