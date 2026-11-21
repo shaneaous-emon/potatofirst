@@ -72,7 +72,6 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
                   <h1 className="t-h1 text-ink">{product.name}</h1>
                   <WishlistButton productId={product.id} productName={product.name} className="size-11 border border-line shadow-none" />
                 </div>
-                <p className="t-body text-ink-soft">{product.subtitle}</p>
                 <a href={`#${REVIEWS_ANCHOR}`} className="flex items-center gap-2 self-start hover:underline">
                   <Stars value={product.rating.average} />
                   <span className="t-body-s text-ink-soft">
@@ -83,7 +82,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
               </div>
               <div className="h-px bg-line" />
               <PurchasePanel
-                product={{ id: product.id, slug: product.slug, name: product.name, image: product.images[0], variants: product.variants }}
+                product={{ id: product.id, slug: product.slug, name: product.name, image: product.images[0], variants: product.variants, categoryName: product.categoryName, categorySlug: product.categorySlug }}
               />
             </div>
           </div>

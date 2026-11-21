@@ -19,6 +19,10 @@ type Base = {
   spacingTop?: Spacing;
   spacingBottom?: Spacing;
   background?: Background;
+  /** Section on/off switch (default true). Disabled sections are not rendered. */
+  enabled?: boolean;
+  /** Optional element keys to hide — see visibility.ts and each section's doc comment. */
+  hide?: string[];
 };
 
 export type Link = { label: string; href: string };

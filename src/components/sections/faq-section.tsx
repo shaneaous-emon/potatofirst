@@ -2,15 +2,16 @@ import { SectionHeader } from "@/components/common/section-header";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getFaqs } from "@/lib/repositories";
 import { SectionShell } from "./section-shell";
+import { headerProps } from "./visibility";
 import type { FaqSection as Props } from "./types";
 
 /** Reusable FAQ accordion section. */
-export async function FaqSection({ header, items, spacingTop, spacingBottom, background }: Props) {
+export async function FaqSection({ header, hide, items, spacingTop, spacingBottom, background }: Props) {
   const list = items ?? (await getFaqs());
   return (
     <SectionShell spacingTop={spacingTop} spacingBottom={spacingBottom} background={background}>
       <div className="mx-auto flex max-w-3xl flex-col gap-6">
-        <SectionHeader {...header} />
+        <SectionHeader {...headerProps(header, hide)} />
         <FaqList items={list} />
       </div>
     </SectionShell>

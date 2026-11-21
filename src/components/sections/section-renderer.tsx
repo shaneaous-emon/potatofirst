@@ -20,7 +20,7 @@ function SectionFallback() {
 export function SectionRenderer({ sections }: { sections: Section[] }) {
   return (
     <>
-      {sections.map((section, i) => {
+      {sections.filter((s) => s.enabled !== false).map((section, i) => {
         const Component = sectionRegistry[section.type] as React.ComponentType<Section>;
         if (!Component) {
           if (process.env.NODE_ENV !== "production") console.warn(`Unknown section type: ${section.type}`);

@@ -12,15 +12,19 @@ import { cn } from "@/lib/utils";
 export function Carousel({
   children,
   itemClassName,
+  firstItemClassName,
   className,
   label,
-  controls = true,
+  controls = "always",
 }: {
   children: React.ReactNode[];
   itemClassName?: string;
+  /** Optional different width for the first item (e.g. a feature tile) */
+  firstItemClassName?: string;
   className?: string;
   label: string;
-  controls?: boolean;
+  /** "always" = show arrows + progress even when everything fits (Figma), "auto" = only when scrollable */
+  controls?: "always" | "auto" | false;
 }) {
   const ref = useRef<HTMLUListElement>(null);
   const [state, setState] = useState({ progress: 0, ratio: 1, start: true, end: true });
@@ -63,12 +67,12 @@ export function Carousel({
         className="scrollbar-none -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-4 sm:mx-0 sm:gap-6 sm:px-0"
       >
         {children.map((child, i) => (
-          <li key={i} className={cn("shrink-0 snap-start", itemClassName)}>
+          <li key={i} className={cn("shrink-0 snap-start", i === 0 && firstItemClassName ? firstItemClassName : itemClassName)}>
             {child}
           </li>
         ))}
       </ul>
-      {controls && scrollable && (
+      {controls && (controls === "always" || scrollable) && (
         <div className="flex items-center gap-2.5">
           <div className="relative h-1 w-full max-w-[360px] overflow-hidden rounded-full bg-line" aria-hidden>
             <div

@@ -5,7 +5,6 @@ import { IconCircle } from "@/components/common/icon-circle";
 import { PageTitle } from "@/components/common/page-title";
 import { WhatsAppIcon } from "@/components/common/whatsapp-icon";
 import { ContactForm } from "@/components/forms/contact-form";
-import { FaqSection } from "@/components/sections/faq-section";
 import { site } from "@/content/site";
 import { whatsappLink } from "@/lib/utils";
 
@@ -68,7 +67,6 @@ export default function ContactPage() {
           </p>
         </div>
       </div>
-      <FaqSection id="faq" type="faq" header={{ eyebrow: "Help", title: "Frequently asked questions" }} />
     </>
   );
 }

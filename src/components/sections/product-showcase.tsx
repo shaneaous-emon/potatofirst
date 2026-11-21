@@ -6,15 +6,19 @@ import { buttonVariants } from "@/components/ui/button";
 import { getCategories, getProducts } from "@/lib/repositories";
 import { FilterableGrid } from "./filterable-grid";
 import { SectionShell } from "./section-shell";
+import { headerProps, isOn } from "./visibility";
 import type { ProductShowcaseSection } from "./types";
 
-/** Figma: 06 Bestselling Products — header, optional category tabs, product grid, CTA. */
-export async function ProductShowcase({ header, query, filterTabs, cta, spacingTop, spacingBottom, background }: ProductShowcaseSection) {
+/**
+ * Figma: 06 Bestselling Products — header, optional category tabs, product grid, CTA.
+ * hide keys: eyebrow | subtitle | viewAll | cta
+ */
+export async function ProductShowcase({ header, hide, query, filterTabs, cta, spacingTop, spacingBottom, background }: ProductShowcaseSection) {
   const [products, categories] = await Promise.all([getProducts(query), getCategories()]);
   return (
     <SectionShell spacingTop={spacingTop} spacingBottom={spacingBottom} background={background}>
       <div className="flex flex-col gap-6 lg:gap-7">
-        <SectionHeader {...header} />
+        <SectionHeader {...headerProps(header, hide)} />
         {filterTabs ? (
           <FilterableGrid
             tabs={categories.map((c) => ({ value: c.slug, label: c.name }))}
@@ -23,7 +27,7 @@ export async function ProductShowcase({ header, query, filterTabs, cta, spacingT
         ) : (
           <ProductGrid products={products} />
         )}
-        {cta && (
+        {cta && isOn(hide, "cta") && (
           <div className="flex justify-center pt-2">
             <Link href={cta.href} className={buttonVariants({ variant: "outline" })}>
               {cta.label}

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Breadcrumb } from "@/components/common/breadcrumb";
@@ -66,9 +65,6 @@ export default async function CategoryPage({ params, searchParams }: PageProps<"
               </li>
             ))}
           </ul>
-          <Link href="/shop" className="self-center t-label text-brown-700 hover:underline">
-            Browse all products →
-          </Link>
         </div>
       </section>
     </>

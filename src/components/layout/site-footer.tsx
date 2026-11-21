@@ -13,7 +13,6 @@ export function SiteFooter() {
             <Logo variant="light" className="w-[130px]" />
             <p className="t-h4 text-orange-500">{site.tagline}</p>
             <p className="t-body-s text-cream-100/70">Convenient, tasty, quality dry foods made from familiar ingredients — delivered across Bangladesh.</p>
-            <p className="t-bn-s text-cream-100/70">পরিচিত উপাদানে তৈরি মানসম্মত স্ন্যাকস।</p>
           </div>
           {footerColumns.map((col) => (
             <div key={col.title} className="flex flex-col gap-3">

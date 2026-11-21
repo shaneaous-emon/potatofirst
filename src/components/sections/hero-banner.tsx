@@ -7,10 +7,10 @@ import type { HeroSection } from "./types";
  * Figma: 03 Hero Banner — two CMS image slots (main + side), image only.
  * Main banner is the LCP element → priority + eager load.
  */
-export function HeroBanner({ main, side, spacingTop = "sm", spacingBottom, background }: HeroSection) {
+export function HeroBanner({ hide, main, side, spacingTop = "sm", spacingBottom, background }: HeroSection) {
   return (
     <SectionShell spacingTop={spacingTop} spacingBottom={spacingBottom} background={background} label="Featured">
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[860fr_396fr] lg:gap-6">
+      <div className={`grid grid-cols-1 gap-4 lg:gap-6 ${side && !hide?.includes("side") ? "lg:grid-cols-[860fr_396fr]" : ""}`}>
         <Link href={main.href} className="group relative block overflow-hidden rounded-lg">
           {main.mobileImage && (
             <Image
@@ -34,7 +34,7 @@ export function HeroBanner({ main, side, spacingTop = "sm", spacingBottom, backg
             className={`aspect-[860/440] h-auto w-full object-cover transition-transform duration-700 group-hover:scale-[1.02] ${main.mobileImage ? "max-sm:hidden" : ""}`}
           />
         </Link>
-        {side && (
+        {side && !hide?.includes("side") && (
           <Link href={side.href} className="group relative hidden overflow-hidden rounded-lg lg:block">
             <Image
               src={side.image.src}

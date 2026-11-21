@@ -92,7 +92,7 @@ export const footerColumns = [
     title: "Company",
     links: [
       { label: "About Potato First", href: "/about" },
-      { label: "Wishlist", href: "/wishlist" },
+      { label: "Our Story", href: "/about#story" },
       { label: "Privacy Policy", href: "/policies/privacy" },
       { label: "Terms & Conditions", href: "/policies/terms" },
     ],

@@ -11,6 +11,10 @@ export const homePage: PageContent = {
   title: "Potato First — Good Food. First Choice.",
   description:
     "Shop potato snacks, date snacks, peanut snacks and snack combos from Potato First. Easy guest checkout, Cash on Delivery across Bangladesh.",
+  /*
+   * Every section: `enabled: false` hides the whole section,
+   * `hide: [...]` switches off optional elements (see components/sections/visibility.ts).
+   */
   sections: [
     {
       id: "hero",
@@ -30,12 +34,14 @@ export const homePage: PageContent = {
     },
     {
       id: "categories",
+      hide: ["eyebrow"], // eyebrow text kept, switched off (Figma)
       type: "categoryGrid",
       header: { eyebrow: "Our Categories", title: "Shop by Category", subtitle: "পছন্দের স্ন্যাকস খুঁজে নিন — ক্যাটাগরি অনুযায়ী", viewAll: { href: "/shop" } },
       categorySlugs: ["date-snacks", "peanut-snacks", "potato-snacks", "snack-combos"],
     },
     {
       id: "bestsellers",
+      hide: ["eyebrow"], // eyebrow text kept, switched off (Figma)
       type: "productShowcase",
       header: { eyebrow: "Customer Favourites", title: "Bestselling Products", subtitle: "সবচেয়ে জনপ্রিয় স্ন্যাকসগুলো এক জায়গায়", viewAll: { href: "/shop?sort=popular" } },
       query: { sort: "popular", limit: 8 },
@@ -54,6 +60,7 @@ export const homePage: PageContent = {
     },
     {
       id: "date-collection",
+      hide: ["eyebrow"], // eyebrow text kept, switched off (Figma)
       type: "productCollection",
       background: "cream",
       header: { eyebrow: "Date Snacks Collection", title: "Date Snacks", subtitle: "প্রকৃতির মিষ্টি স্বাদ, প্রতিদিনের এনার্জি", viewAll: { href: "/category/date-snacks" } },
@@ -62,6 +69,7 @@ export const homePage: PageContent = {
     },
     {
       id: "peanut-collection",
+      hide: ["eyebrow"], // eyebrow text kept, switched off (Figma)
       type: "productCollection",
       background: "white",
       header: { eyebrow: "Peanut Snacks Collection", title: "Peanut Snacks", subtitle: "চায়ের সাথে মুচমুচে বাদাম", viewAll: { href: "/category/peanut-snacks" } },
@@ -70,6 +78,7 @@ export const homePage: PageContent = {
     },
     {
       id: "potato-collection",
+      hide: ["eyebrow"], // eyebrow text kept, switched off (Figma)
       type: "productCollection",
       background: "cream",
       header: { eyebrow: "Potato Snacks Collection", title: "Potato Snacks", subtitle: "মুচমুচে আলুর স্ন্যাকস সবার জন্য", viewAll: { href: "/category/potato-snacks" } },
@@ -78,6 +87,7 @@ export const homePage: PageContent = {
     },
     {
       id: "why-potato-first",
+      hide: ["bodyBn"], // Bangla line switched off (Figma)
       type: "story",
       eyebrow: "Why Potato First",
       title: "Good food should be simple to find — and easy to love.",
@@ -98,12 +108,14 @@ export const homePage: PageContent = {
     },
     {
       id: "reviews",
+      hide: ["eyebrow"], // eyebrow text kept, switched off (Figma)
       type: "reviewReels",
       header: { eyebrow: "Customer Stories", title: "Loved by Snack Lovers", subtitle: "Little bites. Future stories.", viewAll: { href: "/shop" } },
       share: { text: "Share your snack moment · আপনার রিভিউ শেয়ার করুন", cta: { label: "Upload Review", href: "/contact?subject=review" } },
     },
     {
       id: "newsletter",
+      hide: ["socialNote"],
       type: "newsletter",
       newsletter: { title: "Get snack updates first", subtitle: "নতুন প্রোডাক্ট ও অফারের খবর সবার আগে পেতে সাবস্ক্রাইব করুন।" },
       social: {

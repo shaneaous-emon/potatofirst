@@ -66,3 +66,29 @@ TypeScript will error until all three are done.
 - Bangla text uses `t-bn` / `t-bn-s` (Hind Siliguri).
 - Images: always `next/image` with `sizes`; content images come from content/data, never hardcoded in components.
 - Links styled as buttons: `<Link className={buttonVariants({ variant: "outline" })}>`.
+
+## Section visibility (enable / hide)
+
+Every section in `src/content/pages/*.ts` accepts:
+
+- `enabled: false` — the whole section is skipped by `SectionRenderer`; neighbouring sections close up, no empty gap.
+- `hide: ["key", ...]` — switches off optional elements inside a section. Layout reflows (e.g. a hidden side column turns a two-column grid into one).
+
+| Section type | hide keys |
+|---|---|
+| hero | `side` |
+| trust | `subtitle` |
+| categories / feature-grid / faq | `eyebrow`, `subtitle`, `viewAll` (+ `bodyBn` for feature-grid) |
+| showcase (bestsellers) | `eyebrow`, `subtitle`, `viewAll`, `cta` |
+| promo | `eyebrow`, `subtitle`, `offerChip` |
+| collection | `eyebrow`, `subtitle`, `viewAll`, `feature`, `featureSubtitle`, `controls` |
+| story | `eyebrow`, `body`, `bodyBn`, `floatingCard`, `points`, `ctas` |
+| reviews | `eyebrow`, `subtitle`, `viewAll`, `share` |
+| newsletter | `newsletter`, `social`, `socialImages`, `socialNote` |
+| split | `eyebrow`, `bodyBn`, `cta` |
+
+Elements removed in the approved Figma (section eyebrows, story Bangla line, newsletter note) keep their content but ship with `hide` set. In Phase 2 these flags come from the admin panel (Laravel `page_sections.enabled` + `hidden_elements` JSON).
+
+## Live search
+
+`SearchBox` (client) calls `GET /api/search?q=` (debounced 200 ms, min 2 chars) and shows up to 6 suggestions; Enter/"See all" opens `/search?q=`. Arrow keys + Enter select, Esc closes. Phase 2: point the route handler at Laravel `GET /products?q=`.

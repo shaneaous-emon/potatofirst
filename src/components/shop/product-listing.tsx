@@ -20,7 +20,10 @@ export async function ProductListing({
   fixed = {},
   showCategoryFilter = true,
   emptyAction = { label: "Browse all products", href: "/shop" },
+  topSlot,
 }: {
+  /** Rendered above the toolbar in the products column (e.g. quick category chips) */
+  topSlot?: React.ReactNode;
   basePath: string;
   searchParams: Promise<SearchParams>;
   fixed?: ProductQuery;
@@ -52,6 +55,7 @@ export async function ProductListing({
     <div className="flex gap-8">
       <FilterSidebar {...filterProps} />
       <div className="flex min-w-0 flex-1 flex-col gap-6">
+        {topSlot}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="t-body-s text-ink-soft" aria-live="polite">
             {all.length ? `Showing ${from}–${from + products.length - 1} of ${all.length} products` : "No products found"}

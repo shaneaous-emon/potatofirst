@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Phone, ShieldCheck, ShoppingCart, Truck } from "lucide-react";
@@ -14,7 +15,7 @@ import { Price } from "./price";
 import { QuantityStepper } from "./quantity-stepper";
 
 type Props = {
-  product: { id: string; slug: string; name: string; image: ImageAsset; variants: ProductVariant[] };
+  product: { id: string; slug: string; name: string; image: ImageAsset; variants: ProductVariant[]; categoryName: string; categorySlug: string };
 };
 
 /** Figma: Product Details › pack size, quantity, Add to Cart / Order Now / Order via WhatsApp. */
@@ -120,9 +121,17 @@ export function PurchasePanel({ product }: Props) {
           </li>
         ))}
       </ul>
-      <p className="t-body-s text-ink-muted">
-        SKU: <span className="text-ink">{variant.sku}</span>
-      </p>
+      <div className="flex flex-col gap-1.5 t-body-s text-ink-muted">
+        <p>
+          SKU: <span className="text-ink">{variant.sku}</span>
+        </p>
+        <p>
+          Category:{" "}
+          <Link href={`/category/${product.categorySlug}`} className="text-ink hover:text-brown-700 hover:underline">
+            {product.categoryName}
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
