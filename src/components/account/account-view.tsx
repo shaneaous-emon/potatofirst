@@ -1,20 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Loader2, LogOut, MapPin, Package, ShoppingBag, Truck, User } from "lucide-react";
+import {
+  CheckCircle2,
+  Clock,
+  Eye,
+  EyeOff,
+  Loader2,
+  LogOut,
+  MapPin,
+  Package,
+  ShoppingBag,
+  Truck,
+  User,
+  XCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { site } from "@/content/site";
-import { loginCustomer, logoutCustomer, registerCustomer, socialLogin } from "@/lib/services/auth";
+import {
+  getCustomerOrdersAction,
+  type CustomerOrderRecord,
+} from "@/app/(store)/account/actions";
+import {
+  getSessionCustomer,
+  loginCustomer,
+  logoutCustomer,
+  registerCustomer,
+  socialLogin,
+} from "@/lib/services/auth";
 import { parseOrder, readLastOrderRaw } from "@/lib/services/orders";
 import { cn, formatPrice } from "@/lib/utils";
-import { loginSchema, registerSchema, type LoginValues, type RegisterValues } from "@/lib/validation/schemas";
+import {
+  loginSchema,
+  registerSchema,
+  type LoginValues,
+  type RegisterValues,
+} from "@/lib/validation/schemas";
 import { useAuth, type Customer } from "@/stores/auth";
 import { useHydrated } from "@/stores/use-hydrated";
 
@@ -22,6 +50,19 @@ import { useHydrated } from "@/stores/use-hydrated";
 export function AccountView() {
   const hydrated = useHydrated();
   const user = useAuth((s) => s.user);
+  const setUser = useAuth((s) => s.setUser);
+
+  // Sync session on mount
+  useEffect(() => {
+    getSessionCustomer()
+      .then((activeUser) => {
+        if (activeUser && (!user || user.id !== activeUser.id)) {
+          setUser(activeUser);
+        }
+      })
+      .catch(() => null);
+  }, [user, setUser]);
+
   if (!hydrated) return <Skeleton className="h-[520px] w-full rounded-lg" />;
   return user ? <Dashboard user={user} /> : <AuthPanel />;
 }
@@ -29,10 +70,22 @@ export function AccountView() {
 function GoogleIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-5" aria-hidden>
-      <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7z" />
-      <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z" />
-      <path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6h-4a12 12 0 0 0 0 10.8l4-3.1z" />
-      <path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.8 3.6-4.9 6.7-4.9z" />
+      <path
+        fill="#4285F4"
+        d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6h-4a12 12 0 0 0 0 10.8l4-3.1z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.8 3.6-4.9 6.7-4.9z"
+      />
     </svg>
   );
 }
@@ -40,16 +93,29 @@ function GoogleIcon() {
 function FacebookIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-5" aria-hidden>
-      <path fill="#1877F2" d="M24 12a12 12 0 1 0-13.9 11.9v-8.4h-3V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.9v8.4A12 12 0 0 0 24 12z" />
+      <path
+        fill="#1877F2"
+        d="M24 12a12 12 0 1 0-13.9 11.9v-8.4h-3V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.9v8.4A12 12 0 0 0 24 12z"
+      />
     </svg>
   );
 }
 
-function PasswordInput({ id, invalid, ...props }: React.ComponentProps<"input"> & { invalid?: boolean }) {
+function PasswordInput({
+  id,
+  invalid,
+  ...props
+}: React.ComponentProps<"input"> & { invalid?: boolean }) {
   const [show, setShow] = useState(false);
   return (
     <div className="relative">
-      <Input id={id} type={show ? "text" : "password"} aria-invalid={invalid} className="pr-12" {...props} />
+      <Input
+        id={id}
+        type={show ? "text" : "password"}
+        aria-invalid={invalid}
+        className="pr-12"
+        {...props}
+      />
       <button
         type="button"
         onClick={() => setShow(!show)}
@@ -70,7 +136,7 @@ function AuthPanel() {
 
   const done = (u: Customer, msg: string) => {
     setUser(u);
-    toast.success(msg, { description: `Welcome, ${u.name.split(" ")[0]}!` });
+    toast.success(msg, { description: `Welcome back, ${u.name.split(" ")[0]}!` });
   };
 
   return (
@@ -104,8 +170,14 @@ function AuthPanel() {
                 disabled={!!social}
                 onClick={async () => {
                   setSocial("google");
-                  done(await socialLogin("google"), "Signed in with Google");
-                  setSocial(null);
+                  try {
+                    const u = await socialLogin("google");
+                    done(u, "Signed in with Google");
+                  } catch (e) {
+                    toast.error(e instanceof Error ? e.message : "Google sign in failed");
+                  } finally {
+                    setSocial(null);
+                  }
                 }}
               >
                 {social === "google" ? <Loader2 className="animate-spin" /> : <GoogleIcon />} Continue with Google
@@ -119,8 +191,14 @@ function AuthPanel() {
                 disabled={!!social}
                 onClick={async () => {
                   setSocial("facebook");
-                  done(await socialLogin("facebook"), "Signed in with Facebook");
-                  setSocial(null);
+                  try {
+                    const u = await socialLogin("facebook");
+                    done(u, "Signed in with Facebook");
+                  } catch (e) {
+                    toast.error(e instanceof Error ? e.message : "Facebook sign in failed");
+                  } finally {
+                    setSocial(null);
+                  }
                 }}
               >
                 {social === "facebook" ? <Loader2 className="animate-spin" /> : <FacebookIcon />} Continue with Facebook
@@ -132,16 +210,20 @@ function AuthPanel() {
           </div>
         )}
 
-        {tab === "login" ? <LoginForm onDone={(u) => done(u, "Logged in")} onSwitch={() => setTab("register")} /> : <RegisterForm onDone={(u) => done(u, "Account created")} onSwitch={() => setTab("login")} />}
+        {tab === "login" ? (
+          <LoginForm onDone={(u) => done(u, "Logged in successfully")} onSwitch={() => setTab("register")} />
+        ) : (
+          <RegisterForm onDone={(u) => done(u, "Account created successfully")} onSwitch={() => setTab("login")} />
+        )}
       </div>
 
       <aside className="flex flex-col justify-center gap-5 bg-brown-900 p-8 text-cream-100 sm:p-10">
         <h2 className="t-h3">Why create an account?</h2>
         <ul className="flex flex-col gap-4">
           {[
-            { I: Package, t: "Track every order", d: "See all your orders and their status in one place." },
-            { I: MapPin, t: "Faster checkout", d: "Your name, phone and address are filled in for you." },
-            { I: ShoppingBag, t: "Offers for members", d: "Get early access to new flavours and deals." },
+            { I: Package, t: "Track every order", d: "See all your orders and live shipping status in one place." },
+            { I: MapPin, t: "Faster checkout", d: "Your name, phone and address are saved for instant ordering." },
+            { I: ShoppingBag, t: "Exclusive member deals", d: "Get early access to new flavours and discounts." },
           ].map(({ I, t, d }) => (
             <li key={t} className="flex gap-3">
               <span className="grid size-10 shrink-0 place-items-center rounded-full bg-orange-500 text-brown-900">
@@ -167,19 +249,48 @@ function AuthPanel() {
 }
 
 function LoginForm({ onDone, onSwitch }: { onDone: (u: Customer) => void; onSwitch: () => void }) {
-  const { register, handleSubmit, formState } = useForm<LoginValues>({ resolver: zodResolver(loginSchema), defaultValues: { identifier: "", password: "" } });
+  const { register, handleSubmit, formState } = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { identifier: "", password: "" },
+  });
   const e = formState.errors;
+
+  const submit = async (v: LoginValues) => {
+    try {
+      const u = await loginCustomer(v);
+      onDone(u);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Login failed");
+    }
+  };
+
   return (
-    <form noValidate onSubmit={handleSubmit(async (v) => onDone(await loginCustomer(v)))} className="flex flex-col gap-4">
+    <form noValidate onSubmit={handleSubmit(submit)} className="flex flex-col gap-4">
       <FormField id="login-id" label="Phone or email" required error={e.identifier?.message}>
-        <Input id="login-id" autoComplete="username" placeholder="01XXXXXXXXX or you@email.com" aria-invalid={!!e.identifier} {...register("identifier")} />
+        <Input
+          id="login-id"
+          autoComplete="username"
+          placeholder="01XXXXXXXXX or you@email.com"
+          aria-invalid={!!e.identifier}
+          {...register("identifier")}
+        />
       </FormField>
       <FormField id="login-pass" label="Password" required error={e.password?.message}>
-        <PasswordInput id="login-pass" autoComplete="current-password" placeholder="Your password" invalid={!!e.password} {...register("password")} />
+        <PasswordInput
+          id="login-pass"
+          autoComplete="current-password"
+          placeholder="Your password"
+          invalid={!!e.password}
+          {...register("password")}
+        />
       </FormField>
       <button
         type="button"
-        onClick={() => toast("Password reset", { description: "We’ll send a reset code to your phone once the backend is connected." })}
+        onClick={() =>
+          toast("Password reset", {
+            description: "Please contact our support at " + site.hotline + " to reset your password.",
+          })
+        }
         className="-mt-1 cursor-pointer self-end t-body-s text-brown-700 transition-colors hover:text-orange-600 hover:underline"
       >
         Forgot password?
@@ -189,7 +300,11 @@ function LoginForm({ onDone, onSwitch }: { onDone: (u: Customer) => void; onSwit
       </Button>
       <p className="text-center t-body-s text-ink-soft">
         New here?{" "}
-        <button type="button" onClick={onSwitch} className="cursor-pointer t-label text-brown-700 transition-colors hover:text-orange-600 hover:underline">
+        <button
+          type="button"
+          onClick={onSwitch}
+          className="cursor-pointer t-label text-brown-700 transition-colors hover:text-orange-600 hover:underline"
+        >
           Create an account
         </button>
       </p>
@@ -203,29 +318,67 @@ function RegisterForm({ onDone, onSwitch }: { onDone: (u: Customer) => void; onS
     defaultValues: { name: "", phone: "", email: "", password: "", confirm: "" },
   });
   const e = formState.errors;
+
+  const submit = async (v: RegisterValues) => {
+    try {
+      const u = await registerCustomer({
+        name: v.name,
+        phone: v.phone,
+        email: v.email || undefined,
+        password: v.password,
+      });
+      onDone(u);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Account creation failed");
+    }
+  };
+
   return (
-    <form
-      noValidate
-      onSubmit={handleSubmit(async (v) => onDone(await registerCustomer({ name: v.name, phone: v.phone, email: v.email || undefined, password: v.password })))}
-      className="flex flex-col gap-4"
-    >
+    <form noValidate onSubmit={handleSubmit(submit)} className="flex flex-col gap-4">
       <FormField id="reg-name" label="Full name" required error={e.name?.message}>
         <Input id="reg-name" autoComplete="name" placeholder="Your name" aria-invalid={!!e.name} {...register("name")} />
       </FormField>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField id="reg-phone" label="Phone number" required error={e.phone?.message}>
-          <Input id="reg-phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="01XXXXXXXXX" aria-invalid={!!e.phone} {...register("phone")} />
+          <Input
+            id="reg-phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="01XXXXXXXXX"
+            aria-invalid={!!e.phone}
+            {...register("phone")}
+          />
         </FormField>
         <FormField id="reg-email" label="Email" optional error={e.email?.message}>
-          <Input id="reg-email" type="email" autoComplete="email" placeholder="you@email.com" aria-invalid={!!e.email} {...register("email")} />
+          <Input
+            id="reg-email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@email.com"
+            aria-invalid={!!e.email}
+            {...register("email")}
+          />
         </FormField>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField id="reg-pass" label="Password" required error={e.password?.message}>
-          <PasswordInput id="reg-pass" autoComplete="new-password" placeholder="At least 6 characters" invalid={!!e.password} {...register("password")} />
+          <PasswordInput
+            id="reg-pass"
+            autoComplete="new-password"
+            placeholder="At least 6 characters"
+            invalid={!!e.password}
+            {...register("password")}
+          />
         </FormField>
         <FormField id="reg-confirm" label="Confirm password" required error={e.confirm?.message}>
-          <PasswordInput id="reg-confirm" autoComplete="new-password" placeholder="Repeat password" invalid={!!e.confirm} {...register("confirm")} />
+          <PasswordInput
+            id="reg-confirm"
+            autoComplete="new-password"
+            placeholder="Repeat password"
+            invalid={!!e.confirm}
+            {...register("confirm")}
+          />
         </FormField>
       </div>
       <p className="t-caption text-ink-muted">
@@ -244,7 +397,11 @@ function RegisterForm({ onDone, onSwitch }: { onDone: (u: Customer) => void; onS
       </Button>
       <p className="text-center t-body-s text-ink-soft">
         Already have an account?{" "}
-        <button type="button" onClick={onSwitch} className="cursor-pointer t-label text-brown-700 transition-colors hover:text-orange-600 hover:underline">
+        <button
+          type="button"
+          onClick={onSwitch}
+          className="cursor-pointer t-label text-brown-700 transition-colors hover:text-orange-600 hover:underline"
+        >
           Log in
         </button>
       </p>
@@ -254,20 +411,56 @@ function RegisterForm({ onDone, onSwitch }: { onDone: (u: Customer) => void; onS
 
 const noop = () => () => {};
 
+const STATUS_COLOR_MAP: Record<string, { label: string; bg: string; text: string }> = {
+  pending: { label: "Pending", bg: "bg-orange-100", text: "text-orange-700" },
+  confirmed: { label: "Confirmed", bg: "bg-blue-100", text: "text-blue-700" },
+  processing: { label: "Processing", bg: "bg-blue-100", text: "text-blue-700" },
+  packed: { label: "Packed", bg: "bg-purple-100", text: "text-purple-700" },
+  shipped: { label: "On the way", bg: "bg-purple-100", text: "text-purple-700" },
+  out_for_delivery: { label: "Out for delivery", bg: "bg-purple-100", text: "text-purple-700" },
+  delivered: { label: "Delivered", bg: "bg-green-100", text: "text-green-700" },
+  cancelled: { label: "Cancelled", bg: "bg-gray-100", text: "text-gray-600" },
+  returned: { label: "Returned", bg: "bg-red-100", text: "text-red-700" },
+};
+
 function Dashboard({ user }: { user: Customer }) {
   const setUser = useAuth((s) => s.setUser);
+  const [dbOrders, setDbOrders] = useState<CustomerOrderRecord[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+
+  // Fallback sessionStorage order
   const raw = useSyncExternalStore(noop, readLastOrderRaw, () => null);
-  const order = parseOrder(raw);
-  const itemCount = order?.lines.reduce((n, l) => n + l.quantity, 0) ?? 0;
+  const localOrder = parseOrder(raw);
+
+  useEffect(() => {
+    let active = true;
+    getCustomerOrdersAction(user.phone)
+      .then((res) => {
+        if (active) {
+          setDbOrders(res);
+          setLoadingOrders(false);
+        }
+      })
+      .catch(() => {
+        if (active) setLoadingOrders(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [user.phone]);
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
-      <aside className="flex flex-col gap-4 self-start rounded-lg border border-line bg-white p-6">
+      <aside className="flex flex-col gap-4 self-start rounded-lg border border-line bg-white p-6 shadow-sm">
         <div className="flex items-center gap-3">
-          <span className="grid size-14 shrink-0 place-items-center rounded-full bg-orange-500 t-h3 text-brown-900">{user.name.charAt(0).toUpperCase()}</span>
+          <span className="grid size-14 shrink-0 place-items-center rounded-full bg-orange-500 t-h3 text-brown-900">
+            {user.name.charAt(0).toUpperCase()}
+          </span>
           <div className="min-w-0">
             <p className="truncate t-h4 text-ink">{user.name}</p>
-            <p className="truncate t-body-s text-ink-muted">{user.phone ?? user.email ?? `Signed in with ${user.provider}`}</p>
+            <p className="truncate t-body-s text-ink-muted">
+              {user.phone ?? user.email ?? `Signed in with ${user.provider}`}
+            </p>
           </div>
         </div>
         <div className="h-px bg-line" />
@@ -277,7 +470,11 @@ function Dashboard({ user }: { user: Customer }) {
             { I: Truck, l: "Track Order", h: "/track-order" },
             { I: ShoppingBag, l: "Continue Shopping", h: "/shop" },
           ].map(({ I, l, h }) => (
-            <Link key={l} href={h} className="flex items-center gap-3 rounded-sm px-3 py-2.5 t-body-s text-ink-soft transition-colors hover:bg-cream-100 hover:text-brown-700">
+            <Link
+              key={l}
+              href={h}
+              className="flex items-center gap-3 rounded-sm px-3 py-2.5 t-body-s text-ink-soft transition-colors hover:bg-cream-100 hover:text-brown-700"
+            >
               <I className="size-[18px] text-brown-700" aria-hidden /> {l}
             </Link>
           ))}
@@ -286,7 +483,7 @@ function Dashboard({ user }: { user: Customer }) {
             onClick={async () => {
               await logoutCustomer();
               setUser(null);
-              toast("Logged out");
+              toast("Logged out successfully");
             }}
             className="flex cursor-pointer items-center gap-3 rounded-sm px-3 py-2.5 text-left t-body-s text-sale transition-colors hover:bg-sale/10"
           >
@@ -295,17 +492,94 @@ function Dashboard({ user }: { user: Customer }) {
         </nav>
       </aside>
 
-      <section id="orders" className="flex flex-col gap-4 rounded-lg border border-line bg-white p-6 sm:p-8">
-        <h2 className="t-h3 text-ink">My Orders</h2>
-        {order ? (
+      <section id="orders" className="flex flex-col gap-5 rounded-lg border border-line bg-white p-6 sm:p-8 shadow-sm">
+        <div className="flex items-center justify-between">
+          <h2 className="t-h3 text-ink">My Orders</h2>
+          <span className="t-body-s text-ink-muted">
+            {dbOrders.length ? `${dbOrders.length} order${dbOrders.length === 1 ? "" : "s"}` : ""}
+          </span>
+        </div>
+
+        {loadingOrders ? (
+          <div className="flex flex-col gap-3">
+            <Skeleton className="h-24 w-full rounded-md" />
+            <Skeleton className="h-24 w-full rounded-md" />
+          </div>
+        ) : dbOrders.length > 0 ? (
+          <div className="flex flex-col gap-4">
+            {dbOrders.map((o) => {
+              const statusMeta = STATUS_COLOR_MAP[o.status] || {
+                label: o.status,
+                bg: "bg-cream-200",
+                text: "text-ink-soft",
+              };
+              return (
+                <div
+                  key={o.id}
+                  className="flex flex-col gap-3 rounded-lg border border-line p-4 transition-colors hover:border-brown-700/50 sm:p-5"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-3">
+                    <div>
+                      <span className="font-display font-semibold text-ink">#{o.number}</span>
+                      <span className="ml-2 text-[13px] text-ink-muted">
+                        {new Date(o.createdAt).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    <span
+                      className={cn(
+                        "rounded-full px-2.5 py-0.5 text-[12px] font-medium",
+                        statusMeta.bg,
+                        statusMeta.text,
+                      )}
+                    >
+                      {statusMeta.label}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
+                    <div>
+                      <p className="text-[14px] text-ink">
+                        {o.itemCount} item{o.itemCount === 1 ? "" : "s"} ·{" "}
+                        <span className="font-semibold">{formatPrice(o.total)}</span>
+                      </p>
+                      <p className="text-[12px] text-ink-muted">
+                        Payment: {o.paymentMethod === "cod" ? "Cash on Delivery" : o.paymentMethod.toUpperCase()} (
+                        {o.paymentStatus})
+                      </p>
+                    </div>
+
+                    <Link
+                      href={`/track-order?id=${o.number}`}
+                      className={buttonVariants({ variant: "outline", size: "sm" })}
+                    >
+                      <Truck className="size-4" /> Track Order
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : localOrder ? (
           <div className="flex flex-wrap items-center justify-between gap-4 rounded-md border border-line p-4 sm:p-5">
             <div>
-              <p className="t-label text-ink">Order #{order.id}</p>
+              <p className="t-label text-ink">Order #{localOrder.id}</p>
               <p className="t-body-s text-ink-muted">
-                {new Date(order.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })} · {itemCount} item{itemCount === 1 ? "" : "s"} · {formatPrice(order.total)}
+                {new Date(localOrder.createdAt).toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}{" "}
+                · {localOrder.lines.reduce((n, l) => n + l.quantity, 0)} items · {formatPrice(localOrder.total)}
               </p>
             </div>
-            <Link href={`/track-order?id=${order.id}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+            <Link
+              href={`/track-order?id=${localOrder.id}`}
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
               <Truck /> Track
             </Link>
           </div>
@@ -318,7 +592,6 @@ function Dashboard({ user }: { user: Customer }) {
             </Link>
           </div>
         )}
-        <p className="t-caption text-ink-muted">Order history syncs from the backend in phase 2.</p>
       </section>
     </div>
   );

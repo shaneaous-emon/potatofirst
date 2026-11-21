@@ -80,3 +80,28 @@ export async function createStoreOrderAction(
     };
   }
 }
+
+export async function validatePromoAction(
+  code: string,
+  subtotal: number,
+  phone?: string,
+): Promise<{ ok: boolean; discount: number; message: string }> {
+  if (!hasDatabase) {
+    const c = code.trim().toUpperCase();
+    if (c === "WELCOME10") {
+      const discount = Math.round((subtotal * 10) / 100);
+      return { ok: true, discount, message: `You save ৳${discount} (10% off)` };
+    }
+    return { ok: false, discount: 0, message: `"${code.toUpperCase()}" is not a valid promo code.` };
+  }
+
+  try {
+    const { evaluateCoupon } = await import("@/lib/services/orders.server");
+    const res = await evaluateCoupon(code, subtotal, phone);
+    if (!res.ok) return { ok: false, discount: 0, message: res.message };
+    return { ok: true, discount: res.discount, message: res.message };
+  } catch (err) {
+    return { ok: false, discount: 0, message: err instanceof Error ? err.message : "Invalid promo code" };
+  }
+}
+

@@ -45,15 +45,19 @@ export const metadata: Metadata = {
   formatDetection: { telephone: false },
 };
 
+import { AnalyticsScripts } from "@/components/analytics/analytics-scripts";
+
 export const viewport: Viewport = { themeColor: "#5a2b13", width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${poppins.variable} ${inter.variable} ${hind.variable}`}>
       <body className="flex min-h-dvh flex-col">
+        <AnalyticsScripts />
         {children}
         <Toaster position="bottom-center" toastOptions={{ classNames: { toast: "!rounded-xl !bg-brown-900 !text-cream-100 !border-0 !font-sans", description: "!text-cream-100/70", actionButton: "!bg-transparent !text-orange-500 !font-semibold" } }} />
       </body>
     </html>
   );
 }
+

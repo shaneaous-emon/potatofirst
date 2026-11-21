@@ -82,32 +82,52 @@ export function parseOrder(raw: string | null, id?: string | null): Order | null
   }
 }
 
-export type TrackingStep = { status: OrderStatus; label: string; time?: string; state: "done" | "current" | "upcoming" };
+import { trackOrderServerAction, type TrackStep } from "@/app/(store)/track-order/actions";
 
-/** MOCK tracking result — returns a demo timeline for any valid input. */
-/**
- * MOCK tracking. Phase 2 → GET /api/orders/track?order_id=…&phone=…
- * Either value works: phone returns the latest order for that number.
- */
-export async function trackOrder({ orderId, phone }: { orderId?: string; phone?: string }): Promise<{ orderId: string; lookup: "id" | "phone"; phone?: string; steps: TrackingStep[] }> {
-  await new Promise((r) => setTimeout(r, 500));
+export type TrackingStep = TrackStep;
+
+export async function trackOrder({
+  orderId,
+  phone,
+}: {
+  orderId?: string;
+  phone?: string;
+}): Promise<{
+  orderId: string;
+  lookup: "id" | "phone";
+  phone?: string;
+  statusLabel?: string;
+  courier?: string | null;
+  trackingId?: string | null;
+  courierUrl?: string | null;
+  steps: TrackingStep[];
+  error?: string;
+}> {
+  const res = await trackOrderServerAction({ orderId, phone });
+  if (!res.ok) {
+    throw new Error(res.error || "Order not found");
+  }
   return {
-    orderId: orderId || "PF-240018",
-    lookup: orderId ? "id" : "phone",
-    phone,
-    steps: [
-      { status: "placed", label: "Order Placed", time: "DD Mon, 10:30 am", state: "done" },
-      { status: "confirmed", label: "Confirmed", time: "DD Mon, 11:15 am", state: "done" },
-      { status: "packed", label: "Packed", time: "DD Mon, 4:00 pm", state: "done" },
-      { status: "shipped", label: "On the Way", time: "Expected DD Mon", state: "current" },
-      { status: "delivered", label: "Delivered", state: "upcoming" },
-    ],
+    orderId: res.orderId || orderId || "PF-240018",
+    lookup: res.lookup,
+    phone: res.phone || phone,
+    statusLabel: res.statusLabel,
+    courier: res.courier,
+    trackingId: res.trackingId,
+    courierUrl: res.courierUrl,
+    steps: res.steps,
   };
 }
 
-/** MOCK promo validation. Phase 2 → POST /api/coupons/validate */
-export async function validatePromo(code: string, subtotal: number): Promise<{ ok: boolean; discount: number; message: string }> {
-  await new Promise((r) => setTimeout(r, 400));
-  void subtotal;
-  return { ok: false, discount: 0, message: `"${code.toUpperCase()}" is not a valid promo code.` };
+import { validatePromoAction } from "@/app/(store)/checkout/actions";
+
+/** Promo validation with database lookup. */
+export async function validatePromo(
+  code: string,
+  subtotal: number,
+  phone?: string,
+): Promise<{ ok: boolean; discount: number; message: string }> {
+  return validatePromoAction(code, subtotal, phone);
 }
+
+
