@@ -7,44 +7,48 @@ import {
   createCustomerSession,
   destroyCustomerSession,
   readCustomerSession,
-  type CustomerJwtPayload,
 } from "@/lib/customer/session";
 import type { Customer } from "@/stores/auth";
+import { providerConfigured } from "@/lib/customer/oauth";
 
 export async function getCurrentCustomerAction(): Promise<Customer | null> {
   const session = await readCustomerSession();
-  if (!session) return null;
+  if (!session || !hasDatabase) return null;
 
-  if (hasDatabase) {
-    try {
-      const [cust] = await db()
-        .select()
-        .from(t.customers)
-        .where(eq(t.customers.id, session.id))
-        .limit(1);
+  try {
+    const [cust] = await db()
+      .select()
+      .from(t.customers)
+      .where(eq(t.customers.id, session.id))
+      .limit(1);
 
-      if (cust && !cust.blocked) {
-        return {
-          id: String(cust.id),
-          name: cust.name,
-          phone: cust.phone || undefined,
-          email: cust.email || undefined,
-          provider: cust.provider === "guest" ? "password" : cust.provider,
-        };
-      }
-    } catch (e) {
-      console.warn("Failed to fetch customer by ID, using session cache:", e);
+    if (!cust || cust.blocked) {
+      await destroyCustomerSession();
+      return null;
     }
+    return {
+      id: String(cust.id),
+      name: cust.name,
+      phone: cust.phone || undefined,
+      email: cust.email || undefined,
+      provider: cust.provider === "guest" ? "password" : cust.provider,
+    };
+  } catch (e) {
+    console.error("Failed to load current customer:", e);
+    return null;
   }
-
-  return {
-    id: String(session.id),
-    name: session.name,
-    phone: session.phone || undefined,
-    email: session.email,
-    provider: "password",
-  };
 }
+
+/** Which social sign-in buttons to show (only providers with real credentials on the server). */
+export async function getSocialProvidersAction(): Promise<{ google: boolean; facebook: boolean }> {
+  if (!hasDatabase) return { google: false, facebook: false };
+  return { google: providerConfigured("google"), facebook: providerConfigured("facebook") };
+}
+
+const NO_DB = {
+  ok: false as const,
+  error: "Accounts are temporarily unavailable. You can still order as a guest.",
+};
 
 export async function registerCustomerAction(input: {
   name: string;
@@ -61,6 +65,11 @@ export async function registerCustomerAction(input: {
   }
   if (input.password.length < 6) {
     return { ok: false, error: "Password must be at least 6 characters" };
+  }
+
+  if (!hasDatabase) {
+    console.error("registerCustomerAction: DATABASE_URL is not set");
+    return NO_DB;
   }
 
   const hash = await bcrypt.hash(input.password, 10);
@@ -81,11 +90,17 @@ export async function registerCustomerAction(input: {
 
       if (existing.length > 0) {
         const cust = existing[0];
-        if (cust.passwordHash) {
+        if (cust.passwordHash || cust.provider !== "guest") {
           return {
             ok: false,
-            error: "An account already exists with this phone number or email. Please log in.",
+            error:
+              cust.provider === "google" || cust.provider === "facebook"
+                ? `This email is linked to a ${cust.provider === "google" ? "Google" : "Facebook"} account. Please continue with ${cust.provider === "google" ? "Google" : "Facebook"}.`
+                : "An account already exists with this phone number or email. Please log in.",
           };
+        }
+        if (cust.blocked) {
+          return { ok: false, error: "This account has been suspended. Please contact support." };
         }
         // Upgrade existing guest customer to registered user
         await db()
@@ -133,25 +148,7 @@ export async function registerCustomerAction(input: {
     }
   }
 
-  // Graceful fallback when database is not configured
-  const mockId = Math.floor(1000 + Math.random() * 9000);
-  await createCustomerSession({
-    id: mockId,
-    name: input.name.trim(),
-    phone: cleanPhone,
-    email: cleanEmail || undefined,
-  });
-
-  return {
-    ok: true,
-    customer: {
-      id: String(mockId),
-      name: input.name.trim(),
-      phone: cleanPhone,
-      email: cleanEmail || undefined,
-      provider: "password",
-    },
-  };
+  return NO_DB;
 }
 
 export async function loginCustomerAction(input: {
@@ -182,7 +179,10 @@ export async function loginCustomerAction(input: {
       if (!cust.passwordHash) {
         return {
           ok: false,
-          error: "No password set for this account. Please sign up to activate your account.",
+          error:
+            cust.provider === "google" || cust.provider === "facebook"
+              ? `This account uses ${cust.provider === "google" ? "Google" : "Facebook"} sign-in. Please continue with ${cust.provider === "google" ? "Google" : "Facebook"}.`
+              : "No password set for this account. Please sign up to activate your account.",
         };
       }
 
@@ -214,26 +214,8 @@ export async function loginCustomerAction(input: {
     }
   }
 
-  // Fallback
-  const mockId = Math.floor(1000 + Math.random() * 9000);
-  const name = isEmail ? ident.split("@")[0] : "Customer";
-  await createCustomerSession({
-    id: mockId,
-    name,
-    phone: !isEmail ? cleanPhone : "01700000000",
-    email: isEmail ? ident : undefined,
-  });
-
-  return {
-    ok: true,
-    customer: {
-      id: String(mockId),
-      name,
-      phone: !isEmail ? cleanPhone : undefined,
-      email: isEmail ? ident : undefined,
-      provider: "password",
-    },
-  };
+  console.error("loginCustomerAction: DATABASE_URL is not set");
+  return NO_DB;
 }
 
 export async function logoutCustomerAction(): Promise<{ ok: boolean }> {

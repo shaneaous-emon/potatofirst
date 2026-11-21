@@ -1,14 +1,12 @@
 import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies, headers } from "next/headers";
+import { adminSecret } from "@/lib/secrets";
 
 const COOKIE = "pf_admin";
 const MAX_AGE = 60 * 60 * 12; // 12h
 
-function secret() {
-  const s = process.env.ADMIN_SESSION_SECRET || "potatofirst_admin_jwt_session_secret_key_32_chars_minimum_2026";
-  return new TextEncoder().encode(s);
-}
+const secret = adminSecret;
 
 export async function createSession(adminId: number) {
   const token = await new SignJWT({ sub: String(adminId) })
