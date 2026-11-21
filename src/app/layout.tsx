@@ -1,10 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
-import { SiteHeader } from "@/components/layout/site-header";
-import { SiteFooter } from "@/components/layout/site-footer";
-import { CartDrawer } from "@/components/cart/cart-drawer";
-import { StoreHydrator } from "@/components/providers/store-hydrator";
 import { site } from "@/content/site";
 import "./globals.css";
 
@@ -55,16 +51,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={`${poppins.variable} ${inter.variable} ${hind.variable}`}>
       <body className="flex min-h-dvh flex-col">
-        <a href="#main" className="sr-only z-50 rounded bg-brown-700 px-4 py-2 text-cream-100 focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
-          Skip to content
-        </a>
-        <SiteHeader />
-        <main id="main" className="flex-1 pb-16 lg:pb-20">
-          {children}
-        </main>
-        <SiteFooter />
-        <CartDrawer />
-        <StoreHydrator />
+        {children}
         <Toaster position="bottom-center" toastOptions={{ classNames: { toast: "!rounded-xl !bg-brown-900 !text-cream-100 !border-0 !font-sans", description: "!text-cream-100/70", actionButton: "!bg-transparent !text-orange-500 !font-semibold" } }} />
       </body>
     </html>
