@@ -14,6 +14,8 @@ import {
 import { db, t } from "@/db";
 import { requireAdmin } from "@/lib/admin/auth";
 import { can } from "@/lib/admin/permissions";
+import { ActionForm, SubmitButton } from "@/components/admin/action-form";
+import { categoryToggleAction } from "../../_actions/manage";
 
 export const metadata = { title: "Categories" };
 
@@ -62,7 +64,7 @@ export default async function CategoriesPage() {
 
       <Card title="Active Categories">
         <Table
-          head={["Category", "Slug", "Bengali Name", "Sub-Categories", "Products", "Featured"]}
+          head={["Category", "Slug", "Bengali Name", "Sub-Categories", "Products", "Show in shop", "Featured"]}
           empty="No categories found."
         >
           {categoriesRows.map((c) => (
@@ -117,7 +119,26 @@ export default async function CategoriesPage() {
                 {c.productCount} products
               </Td>
               <Td>
-                {c.featured ? (
+                {can(admin.permissions, "categories.edit") ? (
+                  <ActionForm action={categoryToggleAction}>
+                    <input type="hidden" name="id" value={c.id} />
+                    <input type="hidden" name="field" value="active" />
+                    <input type="hidden" name="value" value={String(!c.active)} />
+                    <SubmitButton className={c.active ? "h-8 bg-green-600 px-3 text-[13px] hover:bg-green-500" : "h-8 bg-cream-200 px-3 text-[13px] text-ink hover:bg-cream-100"}>{c.active ? "Visible" : "Hidden"}</SubmitButton>
+                  </ActionForm>
+                ) : (
+                  <Badge tone={c.active ? "green" : "gray"}>{c.active ? "Visible" : "Hidden"}</Badge>
+                )}
+              </Td>
+              <Td>
+                {can(admin.permissions, "categories.edit") ? (
+                  <ActionForm action={categoryToggleAction}>
+                    <input type="hidden" name="id" value={c.id} />
+                    <input type="hidden" name="field" value="featured" />
+                    <input type="hidden" name="value" value={String(!c.featured)} />
+                    <SubmitButton className="h-8 border border-line bg-white px-3 text-[13px] text-ink hover:bg-cream-100">{c.featured ? "★ Featured" : "Feature"}</SubmitButton>
+                  </ActionForm>
+                ) : c.featured ? (
                   <Badge tone="orange">Featured</Badge>
                 ) : (
                   <Badge tone="gray">Standard</Badge>

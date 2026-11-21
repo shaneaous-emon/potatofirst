@@ -66,6 +66,17 @@ export const SETTINGS_DEFAULTS = {
     /** score ≥ this → hold for call verification */
     holdAt: 50,
   },
+  ai: {
+    enabled: true,
+    provider: "gemini" as string,
+    model: "gemini-2.5-flash",
+    /** false = the assistant asks for a click before changing anything; true = it just does it */
+    autoExecute: false,
+    /** provider id → API key (never sent to the browser) */
+    keys: {} as Record<string, string>,
+    /** base URL for the "custom" OpenAI-compatible provider */
+    customBaseUrl: "",
+  },
   inventory: {
     nearExpiryDays: 30,
     blockExpired: true,

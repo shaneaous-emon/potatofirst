@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { ExternalLink, LogOut, Menu, X, type LucideIcon, LayoutDashboard, ShoppingBag, ShieldAlert, Users, Package, FolderTree, Boxes, Star, TicketPercent, Activity, Home, Image, FileText, Mail, Truck, Send, BarChart3, Settings, UserCog, History, Circle } from "lucide-react";
+import { ExternalLink, LogOut, Menu, X, type LucideIcon, LayoutDashboard, ShoppingBag, ShieldBan, Users, Package, FolderTree, Boxes, TicketPercent, Activity, Mail, Truck, Send, BarChart3, Settings, UserCog, History, Sparkles, Circle } from "lucide-react";
 import { can } from "@/lib/admin/permissions";
 import { cn } from "@/lib/utils";
 import { ADMIN_NAV } from "./nav";
 
-const ICONS: Record<string, LucideIcon> = { LayoutDashboard, ShoppingBag, ShieldAlert, Users, Package, FolderTree, Boxes, Star, TicketPercent, Activity, Home, Image, FileText, Mail, Truck, Send, BarChart3, Settings, UserCog, History };
+const ICONS: Record<string, LucideIcon> = { LayoutDashboard, ShoppingBag, ShieldBan, Users, Package, FolderTree, Boxes, TicketPercent, Activity, Mail, Truck, Send, BarChart3, Settings, UserCog, History, Sparkles };
 
-type Badges = Partial<Record<"pendingOrders" | "fraud" | "reviews" | "stock", number>>;
+type Badges = Partial<Record<"pendingOrders" | "stock" | "messages", number>>;
 type Props = { permissions: string[]; name: string; role: string; badges: Badges; logout: () => Promise<void> };
 
 function NavBody({ permissions, badges, onNavigate }: { permissions: string[]; badges: Badges; onNavigate?: () => void }) {

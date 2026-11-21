@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { count, desc, eq, sql } from "drizzle-orm";
-import { Package, Plus, Eye, EyeOff } from "lucide-react";
+import { count, desc, eq, like, or, sql } from "drizzle-orm";
+import { Package, Plus, Eye, EyeOff, Pencil } from "lucide-react";
 import { ActionForm, SubmitButton } from "@/components/admin/action-form";
 import {
   Forbidden,
@@ -19,6 +19,7 @@ import { db, t } from "@/db";
 import { requireAdmin } from "@/lib/admin/auth";
 import { can } from "@/lib/admin/permissions";
 import { toggleProductStatusAction } from "@/app/admin/_actions/settings";
+import { deleteProductAction } from "../../_actions/manage";
 
 export const metadata = { title: "Products" };
 
@@ -48,6 +49,7 @@ export default async function ProductsPage({
       })
       .from(t.products)
       .leftJoin(t.categories, eq(t.categories.id, t.products.categoryId))
+      .where(sp.q ? or(like(t.products.name, `%${sp.q}%`), like(t.products.slug, `%${sp.q}%`)) : undefined)
       .orderBy(desc(t.products.createdAt))
       .limit(50),
     d.select({ totalProducts: count() }).from(t.products),
@@ -62,7 +64,15 @@ export default async function ProductsPage({
       <PageHeader
         title="Products"
         description="Manage catalogue items, pricing, stock levels, and store visibility."
+        actions={
+          can(admin.permissions, "products.create") ? (
+            <Link href="/admin/products/new" className={btn.primary}>
+              <Plus /> New product
+            </Link>
+          ) : undefined
+        }
       />
+      {sp.saved && <p className="mb-4 rounded-sm bg-green-100 px-4 py-2.5 text-[14px] text-green-600">Product saved.</p>}
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
@@ -96,7 +106,7 @@ export default async function ProductsPage({
             "Price From",
             "Stock",
             "Status",
-            editable ? "Visibility" : null,
+            editable ? "Actions" : null,
           ].filter(Boolean)}
           empty="No products found in catalogue."
         >
@@ -121,8 +131,7 @@ export default async function ProductsPage({
                   </div>
                   <div>
                     <Link
-                      href={`/product/${p.slug}`}
-                      target="_blank"
+                      href={editable ? `/admin/products/${p.id}` : `/product/${p.slug}`}
                       className="font-semibold text-brown-700 hover:underline"
                     >
                       {p.name}
@@ -157,6 +166,10 @@ export default async function ProductsPage({
               </Td>
               {editable && (
                 <Td className="whitespace-nowrap">
+                  <div className="flex items-center gap-2">
+                  <Link href={`/admin/products/${p.id}`} className="inline-flex h-8 items-center gap-1 rounded-sm border border-line bg-white px-3 text-[13px] text-ink hover:bg-cream-100">
+                    <Pencil className="size-3.5" /> Edit
+                  </Link>
                   <ActionForm action={toggleProductStatusAction}>
                     <input type="hidden" name="id" value={p.id} />
                     <input
@@ -170,6 +183,13 @@ export default async function ProductsPage({
                       {p.status === "published" ? "Set to Draft" : "Publish"}
                     </SubmitButton>
                   </ActionForm>
+                  {can(admin.permissions, "products.delete") && (
+                    <ActionForm action={deleteProductAction} confirm={`Delete "${p.name}"? Products that already have orders are archived instead.`}>
+                      <input type="hidden" name="id" value={p.id} />
+                      <SubmitButton className="h-8 border border-sale/40 bg-white px-3 text-[13px] text-sale hover:bg-sale hover:text-white">Delete</SubmitButton>
+                    </ActionForm>
+                  )}
+                  </div>
                 </Td>
               )}
             </tr>

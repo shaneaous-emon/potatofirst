@@ -21,6 +21,49 @@ export const TRANSITIONS: Record<OrderStatusKey, OrderStatusKey[]> = {
   failed: [],
 };
 
+const SIDE_EXITS = new Set<OrderStatusKey>(["cancelled", "failed", "returned", "refunded"]);
+
+/** Shortest legal path of statuses from `from` to `to` (excluding `from`). Side exits (cancel/return…) are only allowed as the last step. */
+export function statusPath(from: OrderStatusKey, to: OrderStatusKey): OrderStatusKey[] | null {
+  if (from === to) return [];
+  // cancel / fail / return / refund are never reached by silently moving an order forward — only when legal right now
+  if (SIDE_EXITS.has(to)) return TRANSITIONS[from].includes(to) ? [to] : null;
+  const queue: OrderStatusKey[][] = [[from]];
+  const seen = new Set<OrderStatusKey>([from]);
+  while (queue.length) {
+    const path = queue.shift()!;
+    const last = path[path.length - 1];
+    for (const next of TRANSITIONS[last]) {
+      if (seen.has(next)) continue;
+      if (next === to) return [...path.slice(1), next];
+      if (SIDE_EXITS.has(next)) continue;
+      seen.add(next);
+      queue.push([...path, next]);
+    }
+  }
+  return null;
+}
+
+/** Every status an order can be moved to from `from` in one click (skipping intermediate steps automatically). */
+export function reachableStatuses(from: OrderStatusKey): OrderStatusKey[] {
+  return (Object.keys(TRANSITIONS) as OrderStatusKey[]).filter((s) => s !== from && statusPath(from, s) !== null);
+}
+
+/** Move an order to any reachable status, passing through the required intermediate steps (confirm → pack → ship …) automatically. */
+export async function advanceOrderStatus(orderId: number, to: OrderStatusKey, opts: { adminId?: number | null; note?: string; restock?: boolean; cancelReason?: string } = {}) {
+  const [o] = await db().select({ status: t.orders.status }).from(t.orders).where(eq(t.orders.id, orderId));
+  if (!o) throw new Error("Order not found");
+  const path = statusPath(o.status, to);
+  if (path === null) throw new Error(`Can’t move an order from ${o.status} to ${to}`);
+  let last: Awaited<ReturnType<typeof changeOrderStatus>> | null = null;
+  for (const step of path) {
+    const final = step === to;
+    last = await changeOrderStatus(orderId, step, { ...opts, note: final ? opts.note : "Auto step", restock: final ? opts.restock : false, cancelReason: final ? opts.cancelReason : undefined });
+  }
+  if (!last) throw new Error("Order is already in that status");
+  return last;
+}
+
 /** statuses after which goods have left the warehouse */
 const SHIPPED = new Set<OrderStatusKey>(["shipped", "out_for_delivery", "delivered"]);
 

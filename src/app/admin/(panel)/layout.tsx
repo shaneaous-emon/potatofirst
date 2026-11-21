@@ -1,42 +1,37 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { and, count, eq, lte } from "drizzle-orm";
+import { count, eq, lte } from "drizzle-orm";
 import { AdminSidebar } from "@/components/admin/sidebar";
+import { AiAssistant } from "@/components/admin/ai-assistant";
 import { db, t } from "@/db";
 import { requireAdmin } from "@/lib/admin/auth";
+import { can } from "@/lib/admin/permissions";
+import { PROVIDERS } from "@/lib/ai/providers";
+import { getSetting } from "@/lib/settings";
 import { logoutAction } from "../_actions/auth";
 
 async function Shell({ children }: { children: React.ReactNode }) {
   await connection();
   const admin = await requireAdmin();
-  let badges = { pendingOrders: 0, fraud: 0, reviews: 0, stock: 0 };
+  const ai = await getSetting("ai");
+  const keyed = PROVIDERS.some((p) => !!(ai.keys[p.id] || process.env[p.env]));
+  let badges = { pendingOrders: 0, stock: 0, messages: 0 };
   try {
     const d = db();
-    const [[pending], [fraud], [reviews], [stock]] = await Promise.all([
+    const [[pending], [stock], [messages]] = await Promise.all([
       d.select({ n: count() }).from(t.orders).where(eq(t.orders.status, "pending")),
-      d.select({ n: count() }).from(t.orders).where(and(eq(t.orders.fraudDecision, "none"), eq(t.orders.riskLevel, "high"))),
-      d.select({ n: count() }).from(t.reviews).where(eq(t.reviews.status, "pending")),
       d.select({ n: count() }).from(t.productVariants).where(lte(t.productVariants.stockOnHand, t.productVariants.lowStockThreshold)),
+      d.select({ n: count() }).from(t.contactMessages).where(eq(t.contactMessages.status, "new")),
     ]);
-    badges = {
-      pendingOrders: pending?.n ?? 0,
-      fraud: fraud?.n ?? 0,
-      reviews: reviews?.n ?? 0,
-      stock: stock?.n ?? 0,
-    };
+    badges = { pendingOrders: pending?.n ?? 0, stock: stock?.n ?? 0, messages: messages?.n ?? 0 };
   } catch (err) {
     console.error("Failed to load admin badges:", err);
   }
   return (
     <div className="flex min-h-dvh">
-      <AdminSidebar
-        permissions={admin.permissions}
-        name={admin.name}
-        role={admin.role}
-        badges={badges}
-        logout={logoutAction}
-      />
-      <main className="min-w-0 flex-1 px-4 pb-16 pt-16 sm:px-6 xl:px-8 xl:pt-8">{children}</main>
+      <AdminSidebar permissions={admin.permissions} name={admin.name} role={admin.role} badges={badges} logout={logoutAction} />
+      <main className="min-w-0 flex-1 px-4 pb-24 pt-16 sm:px-6 xl:px-8 xl:pt-8">{children}</main>
+      {ai.enabled && can(admin.permissions, "ai.use") && <AiAssistant model={ai.model} auto={ai.autoExecute} ready={keyed} canConfigure={can(admin.permissions, "ai.configure")} />}
     </div>
   );
 }

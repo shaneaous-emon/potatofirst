@@ -6,7 +6,7 @@ import { db, t } from "@/db";
 import type { OrderStatusKey } from "@/db/schema";
 import { ORDER_STATUSES } from "@/db/schema";
 import { logActivity, requirePermission } from "@/lib/admin/auth";
-import { changeOrderStatus, placeOrder } from "@/lib/services/orders.server";
+import { advanceOrderStatus, placeOrder } from "@/lib/services/orders.server";
 import type { ActionResult } from "@/components/admin/action-form";
 import { redirect } from "next/navigation";
 
@@ -23,11 +23,27 @@ export async function updateStatusAction(_: ActionResult, f: FormData): Promise<
     const id = Number(f.get("id"));
     const to = String(f.get("status")) as OrderStatusKey;
     if (!ORDER_STATUSES.includes(to)) return { ok: false, message: "Unknown status" };
-    const o = await changeOrderStatus(id, to, { adminId: admin.id, note: String(f.get("note") || "") || undefined, restock: f.get("restock") === "on", cancelReason: String(f.get("cancelReason") || "") || undefined });
+    const o = await advanceOrderStatus(id, to, { adminId: admin.id, note: String(f.get("note") || "") || undefined, restock: f.get("restock") === "on", cancelReason: String(f.get("cancelReason") || "") || undefined });
     await logActivity(admin, "order.status", "order", id, `#${o.number} → ${to}`);
     return done(id, `Order moved to ${to.replace(/_/g, " ")}`);
   } catch (e) {
     return fail(e);
+  }
+}
+
+/** One-click status change from the orders list dropdown (non-form call). */
+export async function quickStatusAction(id: number, to: string, opts: { cancelReason?: string; restock?: boolean } = {}): Promise<{ ok: boolean; message: string; status?: string }> {
+  try {
+    const admin = await requirePermission("orders.edit");
+    if (!ORDER_STATUSES.includes(to as OrderStatusKey)) return { ok: false, message: "Unknown status" };
+    const o = await advanceOrderStatus(id, to as OrderStatusKey, { adminId: admin.id, cancelReason: opts.cancelReason?.trim() || undefined, restock: !!opts.restock, note: "Changed from orders list" });
+    await logActivity(admin, "order.status", "order", id, `#${o.number} → ${to}`);
+    revalidatePath("/admin/orders");
+    revalidatePath(`/admin/orders/${id}`);
+    revalidatePath("/admin");
+    return { ok: true, message: `#${o.number} → ${to.replace(/_/g, " ")}`, status: to };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "Something went wrong" };
   }
 }
 
@@ -42,7 +58,7 @@ export async function bulkStatusAction(_: ActionResult, f: FormData): Promise<Ac
     const errors: string[] = [];
     for (const id of ids) {
       try {
-        await changeOrderStatus(id, to, { adminId: admin.id, note: "Bulk update" });
+        await advanceOrderStatus(id, to, { adminId: admin.id, note: "Bulk update" });
         okN++;
       } catch (e) {
         errors.push(e instanceof Error ? e.message : String(e));
@@ -94,27 +110,6 @@ export async function paymentAction(_: ActionResult, f: FormData): Promise<Actio
     }
     await logActivity(admin, `payment.${decision}`, "order", id, `#${o.number} payment ${decision}`);
     return done(id, decision === "refund" ? "Refund recorded" : `Payment marked ${decision}`);
-  } catch (e) {
-    return fail(e);
-  }
-}
-
-export async function fraudDecisionAction(_: ActionResult, f: FormData): Promise<ActionResult> {
-  try {
-    const admin = await requirePermission("fraud.decide");
-    const id = Number(f.get("id"));
-    const decision = String(f.get("decision")) as "accepted" | "hold" | "rejected";
-    const reason = String(f.get("reason") || "").trim();
-    await db().update(t.orders).set({ fraudDecision: decision }).where(eq(t.orders.id, id));
-    await db().insert(t.orderHistory).values({ orderId: id, toStatus: "note", note: `Fraud review: ${decision}${reason ? ` — ${reason}` : ""}`, adminId: admin.id });
-    if (decision === "rejected") await changeOrderStatus(id, "cancelled", { adminId: admin.id, cancelReason: `Rejected in fraud review${reason ? `: ${reason}` : ""}` }).catch(() => null);
-    if (f.get("blockCustomer") === "on") {
-      const [o] = await db().select().from(t.orders).where(eq(t.orders.id, id));
-      if (o?.customerId) await db().update(t.customers).set({ blocked: true, blockReason: reason || "Fraud review", group: "risk" }).where(eq(t.customers.id, o.customerId));
-    }
-    await logActivity(admin, "fraud.decision", "order", id, `Decision ${decision}${reason ? `: ${reason}` : ""}`);
-    revalidatePath("/admin/fraud");
-    return done(id, `Marked ${decision}`);
   } catch (e) {
     return fail(e);
   }

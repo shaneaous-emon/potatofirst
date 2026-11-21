@@ -8,8 +8,8 @@ import { db, t } from "@/db";
 import { requireAdmin } from "@/lib/admin/auth";
 import { can } from "@/lib/admin/permissions";
 import { COURIERS, courierTrackingUrl } from "@/lib/couriers";
-import { TRANSITIONS, successRatio } from "@/lib/services/orders.server";
-import { assignAction, fraudDecisionAction, noteAction, paymentAction, updateShipmentAction, updateStatusAction } from "../../../_actions/orders";
+import { reachableStatuses, successRatio } from "@/lib/services/orders.server";
+import { assignAction, noteAction, paymentAction, updateShipmentAction, updateStatusAction } from "../../../_actions/orders";
 
 export const metadata = { title: "Order" };
 
@@ -29,7 +29,7 @@ export default async function OrderDetail({ params, searchParams }: PageProps<"/
     successRatio(o.phone),
   ]);
   const edit = can(admin.permissions, "orders.edit");
-  const next = TRANSITIONS[o.status];
+  const next = reachableStatuses(o.status);
   const refunded = pays.filter((p) => p.kind === "refund").reduce((a, p) => a + p.amount, 0);
   const trackUrl = o.courier && o.trackingId ? courierTrackingUrl(o.courier, o.trackingId) : null;
   const wa = `https://wa.me/88${o.phone}`;
@@ -49,7 +49,13 @@ export default async function OrderDetail({ params, searchParams }: PageProps<"/
           </>
         }
       />
-      {sp.created && <p className="mb-4 rounded-sm bg-green-100 px-4 py-2.5 text-[14px] text-green-600">Order #{sp.created} created.</p>}
+      {o.riskLevel !== "low" && (
+        <div className="mb-4 flex flex-wrap items-start gap-3 rounded-sm border border-orange-500/40 bg-orange-100 px-4 py-2.5 text-[13px] text-ink">
+          <RiskBadge level={o.riskLevel} />
+          <span className="min-w-0 flex-1">Call the customer to confirm before shipping. {o.riskReasons.join(" · ")}</span>
+        </div>
+      )}
+      {sp.created &&<p className="mb-4 rounded-sm bg-green-100 px-4 py-2.5 text-[14px] text-green-600">Order #{sp.created} created.</p>}
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_380px]">
         <div className="flex flex-col gap-5">
@@ -244,42 +250,6 @@ export default async function OrderDetail({ params, searchParams }: PageProps<"/
                 <b className={`block text-[16px] ${sr.ratio != null && sr.ratio < 60 ? "text-sale" : "text-green-600"}`}>{sr.ratio == null ? "—" : `${sr.ratio}%`}</b> success
               </div>
             </div>
-          </Card>
-
-          <Card title="Fraud check" actions={<RiskBadge level={o.riskLevel} />}>
-            <p className="text-[13px] text-ink-muted">
-              Score {o.riskScore}/100 · decision: <b className="text-ink">{o.fraudDecision}</b>
-              {o.ip && <span className="block">IP {o.ip}</span>}
-            </p>
-            {o.riskReasons.length > 0 ? (
-              <ul className="mt-2 list-disc pl-5 text-[13px] text-ink">
-                {o.riskReasons.map((r) => (
-                  <li key={r}>{r}</li>
-                ))}
-              </ul>
-            ) : (
-              <p className="mt-2 text-[13px] text-green-600">No warning signs.</p>
-            )}
-            {can(admin.permissions, "fraud.decide") && !["cancelled", "delivered", "refunded"].includes(o.status) && (
-              <ActionForm action={fraudDecisionAction} className="mt-3 flex flex-col gap-2">
-                <input type="hidden" name="id" value={o.id} />
-                <input name="reason" placeholder="Reason / call notes" className={inputCls} />
-                <label className="flex items-center gap-2 text-[13px]">
-                  <input type="checkbox" name="blockCustomer" className="accent-brown-700" /> Also block this customer
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  <SubmitButton name="decision" value="accepted" className="bg-green-600 hover:bg-green-500">
-                    Accept
-                  </SubmitButton>
-                  <SubmitButton name="decision" value="hold" className="bg-orange-500 text-brown-900 hover:bg-orange-600">
-                    Hold for call
-                  </SubmitButton>
-                  <SubmitButton name="decision" value="rejected" className="bg-sale hover:bg-sale/90">
-                    Reject
-                  </SubmitButton>
-                </div>
-              </ActionForm>
-            )}
           </Card>
 
           {edit && (

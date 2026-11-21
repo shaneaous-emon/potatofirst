@@ -16,6 +16,7 @@ import { db, t } from "@/db";
 import { requireAdmin } from "@/lib/admin/auth";
 import { can } from "@/lib/admin/permissions";
 import { createCouponAction } from "@/app/admin/_actions/settings";
+import { couponDeleteAction, couponToggleAction } from "../../_actions/manage";
 
 export const metadata = { title: "Coupons & Discounts" };
 
@@ -58,7 +59,7 @@ export default async function CouponsPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
         <Card title="Active Coupons">
           <Table
-            head={["Code", "Type", "Discount", "Min Order", "Used", "Status"]}
+            head={["Code", "Type", "Discount", "Min Order", "Used", "Status", editable ? "Actions" : null].filter(Boolean)}
             empty="No coupons found."
           >
             {couponsRows.map((c) => (
@@ -85,6 +86,21 @@ export default async function CouponsPage() {
                     <Badge tone="gray">Disabled</Badge>
                   )}
                 </Td>
+                {editable && (
+                  <Td>
+                    <div className="flex gap-2">
+                      <ActionForm action={couponToggleAction}>
+                        <input type="hidden" name="code" value={c.code} />
+                        <input type="hidden" name="active" value={String(!c.active)} />
+                        <SubmitButton className="h-8 border border-line bg-white px-3 text-[13px] text-ink hover:bg-cream-100">{c.active ? "Disable" : "Enable"}</SubmitButton>
+                      </ActionForm>
+                      <ActionForm action={couponDeleteAction} confirm={`Delete coupon ${c.code}?`}>
+                        <input type="hidden" name="code" value={c.code} />
+                        <SubmitButton className="h-8 border border-sale/40 bg-white px-3 text-[13px] text-sale hover:bg-sale hover:text-white">Delete</SubmitButton>
+                      </ActionForm>
+                    </div>
+                  </Td>
+                )}
               </tr>
             ))}
           </Table>
