@@ -17,7 +17,7 @@ export function CartLineItem({ line, variant = "page", onNavigate }: { line: Car
 
   return (
     <li className={cn("flex items-center gap-3 border-b border-line sm:gap-4", variant === "summary" ? "py-3" : "py-4 sm:py-5", "last:border-b-0")}>
-      <Link href={href} onClick={onNavigate} className={cn("relative shrink-0 overflow-hidden rounded-sm bg-cream-100", thumb)}>
+      <Link href={href} onClick={onNavigate} className={cn("relative shrink-0 overflow-hidden rounded-sm bg-cream-100 transition-opacity hover:opacity-85", thumb)}>
         <Image src={line.image.src} alt={line.image.alt} fill sizes="88px" className="object-cover" />
       </Link>
       <div className="flex min-w-0 flex-1 flex-col gap-1">

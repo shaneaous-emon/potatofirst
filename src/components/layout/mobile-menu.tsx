@@ -4,16 +4,18 @@ import Link from "next/link";
 import { ChevronRight, Heart, Leaf, Menu, Phone, Truck, User } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { mainNav } from "@/content/site";
+import { mainNav, site } from "@/content/site";
 import { cn } from "@/lib/utils";
 
-const QUICK = [
+const ALL_QUICK = [
   { icon: Truck, label: "Track Order", href: "/track-order" },
   { icon: Heart, label: "Wishlist", href: "/wishlist" },
   { icon: User, label: "My Account", href: "/account" },
   { icon: Phone, label: "Help & Support", href: "/contact" },
   { icon: Leaf, label: "About Potato First", href: "/about" },
 ];
+
+const QUICK = ALL_QUICK.filter((q) => q.href !== "/wishlist" || site.features.wishlist.enabled);
 
 /** Figma: Mobile Menu Drawer — 390. Also used as the desktop "More" menu. */
 export function MobileMenu({ trigger = "icon" }: { trigger?: "icon" | "more" }) {

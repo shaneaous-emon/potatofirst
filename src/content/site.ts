@@ -8,10 +8,10 @@ export const site = {
   description:
     "Potato First — convenient, tasty, quality snacks made from familiar ingredients. Potato snacks, date snacks, peanut snacks and snack combos delivered across Bangladesh.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://potatofirst.example",
-  hotline: "01XXX-XXXXXX",
+  hotline: "01701891988",
   /** International format without "+", used for wa.me links */
-  whatsapp: "8801XXXXXXXXX",
-  email: "hello@yourdomain.com",
+  whatsapp: "8801701891988",
+  email: "info@potatofirst.com",
   address: "Address goes here, Dhaka",
   hours: "Sat – Thu, 10am – 8pm",
   announcement: {
@@ -24,11 +24,19 @@ export const site = {
     "outside-dhaka": { label: "Outside Dhaka", labelBn: "ঢাকার বাইরে", charge: 130, eta: "2–4 days" },
   },
   social: {
-    // Leave null until the real accounts are confirmed.
-    instagram: null as string | null,
-    facebook: null as string | null,
+    instagram: "https://www.instagram.com/" as string | null,
+    facebook: "https://www.facebook.com/shaneaous.emon" as string | null,
   },
-  credit: { name: "Shaneaous Emon", href: "https://www.facebook.com/" },
+  credit: { name: "Shaneaous Emon", href: "https://www.facebook.com/shaneaous.emon" },
+  /**
+   * Feature switches (admin-controlled in phase 2).
+   * wishlist.enabled=false: no heart buttons, no /wishlist page, no menu link.
+   * wishlist.hoverOnly=true: when enabled, the heart appears on card hover
+   * (always visible on touch devices, which have no hover).
+   */
+  features: {
+    wishlist: { enabled: false, hoverOnly: true },
+  },
 } as const;
 
 export type NavItem = { label: string; href: string; highlight?: boolean; children?: { label: string; href: string }[] };

@@ -195,11 +195,11 @@ export function CheckoutForm() {
               <Checkbox checked={field.value === true} onCheckedChange={(c) => field.onChange(c === true)} aria-invalid={!!errors.agree} className="mt-0.5" />
               <span className="t-body-s text-ink-soft">
                 I agree to the{" "}
-                <Link href="/policies/terms" className="text-brown-700 underline">
+                <Link href="/policies/terms" className="text-brown-700 underline transition-colors hover:text-orange-600">
                   Terms &amp; Conditions
                 </Link>{" "}
                 and{" "}
-                <Link href="/policies/returns" className="text-brown-700 underline">
+                <Link href="/policies/returns" className="text-brown-700 underline transition-colors hover:text-orange-600">
                   Return Policy
                 </Link>
               </span>

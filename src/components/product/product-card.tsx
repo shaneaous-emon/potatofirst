@@ -37,7 +37,7 @@ export function ProductCard({ product, priority, className }: { product: Product
             {product.badge.text}
           </Badge>
         )}
-        <WishlistButton productId={product.id} productName={product.name} className="absolute right-2 top-2 sm:right-3 sm:top-3" />
+        <WishlistButton productId={product.id} productName={product.name} className="absolute right-2 top-2 transition-opacity sm:right-3 sm:top-3" hoverReveal />
       </div>
       <div className="flex flex-1 flex-col gap-1 p-3 sm:gap-1.5 sm:p-4">
         <p className="t-eyebrow truncate !tracking-[0.06em] text-orange-600 max-sm:text-[10px]">{product.categoryName}</p>

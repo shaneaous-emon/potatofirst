@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { site } from "@/content/site";
 import { PageTitle } from "@/components/common/page-title";
 import { ProductCard } from "@/components/product/product-card";
 import { WishlistView } from "@/components/product/wishlist-view";
@@ -8,6 +10,7 @@ export const metadata: Metadata = { title: "Wishlist", robots: { index: false } 
 
 /** Phase 2: fetch only wishlisted ids (GET /api/products?ids=…) or the customer's saved list. */
 export default async function WishlistPage() {
+  if (!site.features.wishlist.enabled) notFound();
   const products = await getProducts();
   return (
     <>

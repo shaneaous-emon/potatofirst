@@ -14,7 +14,7 @@ export function PromoCode({ subtotal, onApplied, defaultOpen = false }: { subtot
 
   return (
     <div className={cn("rounded-sm", open ? "bg-cream-100 p-4" : "border border-dashed border-line px-4 py-3.5")}>
-      <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="flex w-full cursor-pointer items-center justify-between gap-3">
+      <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="flex w-full cursor-pointer items-center justify-between gap-3 transition-colors hover:text-brown-700">
         <span className="flex items-center gap-2.5 t-label text-ink">
           <Tag className="size-[18px] text-orange-600" aria-hidden /> Have a promo code?
         </span>

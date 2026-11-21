@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 export function Logo({ variant = "dark", className, priority }: { variant?: "dark" | "light"; className?: string; priority?: boolean }) {
   return (
-    <Link href="/" aria-label="Potato First — home" className={cn("inline-block shrink-0", className)}>
+    <Link href="/" aria-label="Potato First — home" className={cn("inline-block shrink-0 transition-opacity hover:opacity-80", className)}>
       <Image
         src={variant === "dark" ? "/logo-dark.svg" : "/logo-light.svg"}
         alt="Potato First"
