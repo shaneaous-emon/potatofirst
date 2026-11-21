@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Potato First — E-commerce Frontend
 
-## Getting Started
+Customer-facing storefront for **Potato First** (Good Food. First Choice.), built from the approved Figma design
+([Figma file](https://www.figma.com/design/M802jAuJDRmnyuKzZIz7Ew)).
 
-First, run the development server:
+> Phase 1 = frontend only, running on **mock data**. The backend (Laravel + MySQL) and admin panel come later —
+> see `API_INTEGRATION_PLAN.md`.
+
+## Tech stack
+| | |
+|---|---|
+| Framework | Next.js 16 (App Router, React Server Components, Cache Components / PPR) |
+| Language | TypeScript (strict) |
+| Styling | Tailwind CSS v4 — tokens mirror the Figma variables (`src/app/globals.css`) |
+| UI primitives | shadcn/ui pattern on Radix (`src/components/ui`) + Lucide icons |
+| State | Zustand (cart + wishlist, persisted to localStorage) |
+| Forms | React Hook Form + Zod |
+| Notifications | Sonner |
+| Fonts | Self-hosted via `next/font/local`: Poppins (headings), Inter (body), Hind Siliguri (Bangla) |
+
+## Getting started (Windows / macOS / Linux)
+Requires **Node.js 20.9+** (22 LTS recommended).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd C:\projects\potatofirst
+npm install
+npm run dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Script | What it does |
+|---|---|
+| `npm run dev` | Dev server |
+| `npm run build` | Production build (type-checks too) |
+| `npm start` | Serve the production build |
+| `npm run lint` | ESLint |
+| `npx tsc --noEmit` | Type-check only |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Optional `.env.local`:
+```
+NEXT_PUBLIC_SITE_URL=https://www.potatofirst.com
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Pages
+| Route | Page |
+|---|---|
+| `/` | Homepage (section-driven, `src/content/pages/home.ts`) |
+| `/shop` | All products — filters, sort, pagination (state in URL) |
+| `/category/[slug]` | Category pages: potato-snacks, date-snacks, peanut-snacks, snack-combos |
+| `/product/[slug]` | Product details — gallery, pack sizes, qty, Add to Cart / Order Now / WhatsApp, tabs, related |
+| `/cart` | Cart + order summary + promo code |
+| `/checkout` | One-page guest checkout (COD default, bKash, Online) |
+| `/order-confirmed` | Thank-you page |
+| `/track-order` | Order tracking (demo timeline) |
+| `/search?q=` | Search results |
+| `/wishlist` | Saved products |
+| `/about`, `/contact` | Info pages |
+| `/policies/[slug]` | privacy, terms, returns, delivery, faq |
+| `/account` | Placeholder (accounts optional, phase 2) |
 
-## Learn More
+Global: header (desktop + mobile), mega-dropdowns, mobile menu drawer, cart drawer, toasts, 404, error page,
+`sitemap.xml`, `robots.txt`, Product JSON-LD.
 
-To learn more about Next.js, take a look at the following resources:
+## Placeholders to replace before launch
+Prices, delivery charges (৳70 / ৳130), hotline `01XXX-XXXXXX`, WhatsApp number, email, address, social links,
+review names/quotes, policy text, promo codes. Most live in `src/content/site.ts` and `src/data/mock/*`.
+The footer credit link (`site.credit.href`) needs the real Facebook profile URL.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Docs
+- `PROJECT_ARCHITECTURE.md` — folders, data flow, rendering & caching
+- `COMPONENT_GUIDE.md` — components, sections, how to add/reuse a section
+- `API_INTEGRATION_PLAN.md` — Laravel REST endpoints and how to swap mock → API
